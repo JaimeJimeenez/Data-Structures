@@ -22,7 +22,7 @@
   Introduce aquí los nombres de los componentes del grupo:
   
   Componente 1: Jaime Jiménez Nieto
-  Componente 2: Ivan Pisonera Díaz
+  Componente 2: Ivan Pisonero Díaz
 */
 //@ </answer>
 
@@ -161,7 +161,7 @@ template <typename T> void QueueLinkedList<T>::free_nodes_from(Node *other) {
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-//Coste O(N) siendo N el tiempo en que se está observando el experimento
+//Coste O(max(M, T)) siendo M el tiempo de reproduccion de los nuevos hijos y T el tiempo de observacion del experimento
 int numHijos(int N, int M, int T) {
   QueueLinkedList<int> adultos; //De longitud N
   QueueLinkedList<int> hijos; //De longitud M
