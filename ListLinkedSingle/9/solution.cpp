@@ -186,14 +186,11 @@ void ListLinkedSingle::display(std::ostream& out) const {
 }
 
 void ListLinkedSingle::duplicate() {
+    Node* curr = nullptr;
+    Node* prev = nullptr;
 
-    if (!empty()) {
-        Node* curr = head;
-        while (curr != nullptr) {
-           Node* aux = curr->next;
-           curr->next = new Node {curr->value, aux};
-           curr = curr->next;
-        }
+    while(...) {
+        
     }
 }
 
@@ -210,6 +207,7 @@ void tratar_caso() {
     
     list.duplicate();
     list.display();
+    cout << endl;
 }
 
 
