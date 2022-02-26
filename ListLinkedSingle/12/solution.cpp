@@ -206,44 +206,33 @@ void ListLinkedSingle::display(std::ostream &out) const {
 // Implementa a continuación el método pedido.
 
 void ListLinkedSingle::intersect(const ListLinkedSingle &other) {
-	if (other.empty()) {
-		delete_list(head);
+	Node* curr_this = head;
+	Node* curr_other = other.head;
+	Node* prev = nullptr;
+
+	while (curr_this != nullptr && curr_other != nullptr) {
+		if (curr_this->value == curr_other->value) {
+			prev = curr_this;
+			curr_this = curr_this->next;
+			curr_other = curr_other->next;
+		}
+		else if (curr_this->value > curr_other->value)
+			curr_other = curr_other->next;
+		else {
+			if (prev != nullptr) 
+				prev->next = curr_this->next;
+			else 
+				head = curr_this->next;
+			curr_this = curr_this->next;
+		}
+	}
+
+	if (prev != nullptr)
+		prev->next = nullptr;
+	else
 		head = nullptr;
-		return;
-	}
-	
-	if (head != nullptr) {
-		Node* previous = nullptr;
-		Node* current = head;
-		Node* current_other = other.head;
 
-		while (current != nullptr && current_other != nullptr) {
-			if (current->value == current_other->value) {
-				previous = current;
-				current = current->next;
-                previous->next = nullptr;
-			}
-			else if (current->value < current_other->value) {
-				if (current == head) {
-					pop_front();
-					current = head;
-				}
-				else {
-					Node* aux = current;
-					current = current->next;
-					delete aux;
-					previous->next = current;
-				}
-			}
-			else current_other = current_other->next;
-		}
-
-		if (current_other == nullptr) {
-			delete_list(current);
-			current = nullptr;
-			head = current;
-		}
-	}
+	delete_list(curr_this);
 }
 
 using namespace std;
