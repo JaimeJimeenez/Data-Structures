@@ -186,41 +186,19 @@ void ListLinkedSingle::display(std::ostream& out) const {
 }
 
 void ListLinkedSingle::reverse_segment(int init, int fin) {
-    if (empty())
-        return;
+   if (empty())
+    return;
 
-    if (init == 0 && fin == 0)
-        return;
-
-    int cont = 0;
     Node* curr = head;
-    Node* initNode = nullptr;
-    
-    //Se posiciona en el nodo a cortar
-    while (cont != init) {
-        initNode = curr;
+    Node* prevInit = nullptr;
+    while (init--) {
+        prevInit = curr;
         curr = curr->next;
-        cont++;
     }
 
-    Node* nodeFin = curr;
     
-    while (cont != fin) {
-        nodeFin = nodeFin->next;
-        cont++;
-    }
 
-    Node* aux = nullptr;
-    Node* prev = nullptr;
-    while (initNode != nodeFin) {
-        aux = curr->next;
-        curr->next = prev;
-        prev = curr;
-        curr = aux;
-        initNode = prev;
-    }
-
-    //cout << curr->value << endl;
+    cout << "C_init" << curr->value << endl; 
 }
 
 bool tratar_caso() {
