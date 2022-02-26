@@ -186,12 +186,18 @@ void ListLinkedSingle::display(std::ostream& out) const {
 }
 
 void ListLinkedSingle::duplicate() {
-    Node* curr = nullptr;
-    Node* prev = nullptr;
+    if (empty())
+        return;
+    
+    Node* curr = head;
+    Node* nextNode = nullptr;
 
-    while(...) {
-        
+    while (curr != nullptr) {
+        nextNode = curr->next;
+        curr->next = new Node {curr->value, nextNode};
+        curr = nextNode;
     }
+
 }
 
 
@@ -226,7 +232,7 @@ int main() {
 #ifndef DOMJUDGE
     std::cin.rdbuf(cinbuf);
     // Descomentar si se trabaja en Windows
-    system("PAUSE");
+    //system("PAUSE");
 #endif
     return 0;
 }
