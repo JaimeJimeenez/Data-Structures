@@ -18,7 +18,6 @@
 #include <cassert>
 #include <fstream>
 
-using namespace std;
 
 class ListLinkedSingle {
 private:
@@ -94,7 +93,7 @@ public:
 	}
 
 	// Nuevo método. Debe implementarse abajo
-	void merge(ListLinkedSingle &l2);
+	void intersect(const ListLinkedSingle &l2);
 
 private:
 	Node *head;
@@ -206,53 +205,58 @@ void ListLinkedSingle::display(std::ostream &out) const {
 
 // Implementa a continuación el método pedido.
 
-void ListLinkedSingle::merge(ListLinkedSingle& other) {
-	if (other.empty()) 
-		return;
-	if (empty()) {
-		head = other.head;
-		other.head = nullptr;
-		return;
-	}
-	
-	Node* curr = head;
-	Node* curr_other;
-
-	if (head->value > other.head->value) {
-		curr = curr->next;
-		head = other.head;
-	}
-
-	Node* curr = head;
+void ListLinkedSingle::intersect(const ListLinkedSingle &other) {
+	Node* curr_this = head;
 	Node* curr_other = other.head;
+	Node* prev = nullptr;
 
-	while (curr != nullptr && curr_other != nullptr) {
-
+	while (curr_this != nullptr && curr_other != nullptr) {
+		if (curr_this->value == curr_other->value) {
+			prev = curr_this;
+			curr_this = curr_this->next;
+			curr_other = curr_other->next;
+		}
+		else if (curr_this->value > curr_other->value)
+			curr_other = curr_other->next;
+		else {
+			if (prev != nullptr) 
+				prev->next = curr_this->next;
+			else 
+				head = curr_this->next;
+			curr_this = curr_this->next;
+		}
 	}
 
-	other.head = nullptr;
+	if (prev != nullptr)
+		prev->next = nullptr;
+	else
+		head = nullptr;
+
+	delete_list(curr_this);
 }
 
+using namespace std;
+
 void tratar_caso() {
-    ListLinkedSingle list;
-    int value;
-    cin >> value;
 
-    while (value != 0) {
-        list.push_back(value);
-        cin >> value;
-    }
+	ListLinkedSingle list, other;
+  	int n, value;
+	
+	cin >> n;
+	for (int i = 0; i < n; i++) {
+		cin >> value;
+		list.push_back(value);
+	}
 
-    ListLinkedSingle other;
-    cin >> value;
-    
-    while(value != 0) {
-        other.push_back(value);
-        cin >> value;
-    }
-	list.merge(other);
+	cin >> n;
+	for (int i = 0; i < n; i++) {
+		cin >> value;
+		other.push_back(value);
+	}
+
+	list.intersect(other);
 	list.display();
-	cout << endl;
+	cout << "\n";
 }
 
 //@ </answer>
@@ -262,19 +266,21 @@ void tratar_caso() {
 
 int main() {
 #ifndef DOMJUDGE
-  std::ifstream in("sample.in");
-  auto cinbuf = std::cin.rdbuf(in.rdbuf());
+	std::ifstream in("sample.in");
+	auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-  
- int numCasos;
- cin >> numCasos;
- while (numCasos--)
-    tratar_caso();
+
+	// Leemos el número de casos de prueba que vendrán a continuación
+	int num_casos;
+	cin >> num_casos;
+
+	for (int i = 0; i < num_casos; i++) {
+		tratar_caso();
+	}
 
 #ifndef DOMJUDGE
-  std::cin.rdbuf(cinbuf);
-  // Descomentar si se trabaja en Windows
-  // system("PAUSE");
+	std::cin.rdbuf(cinbuf);
+	//system("PAUSE");
 #endif
-  return 0;
+	return 0;
 }

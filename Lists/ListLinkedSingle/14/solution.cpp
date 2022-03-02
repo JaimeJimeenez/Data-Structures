@@ -209,27 +209,27 @@ void ListLinkedSingle::display(std::ostream &out) const {
 void ListLinkedSingle::merge(ListLinkedSingle& other) {
 	if (other.empty()) 
 		return;
-	
-	Node* curr = head;
-	Node* curr_other = other.head;
-	Node* aux = head;
-
-	while (curr != nullptr && curr_other != nullptr) {
-		if (curr->value < curr_other->value) {
-			Node* target = curr->next; 
-			curr = curr_other->next; 
-			aux->next = curr_other;
-			aux = curr_other;
-			curr_other = target;
-		}
-		else if (curr->value > curr_other->value) {
-
-		}
+	if (empty()) {
+		head = other.head;
+		other.head = nullptr;
+		return;
 	}
 	
-	if (other.head->value < head->value)
+	Node* curr = head;
+	Node* curr_other;
+
+	if (head->value > other.head->value) {
+		curr = curr->next;
 		head = other.head;
-	
+	}
+
+	Node* curr = head;
+	Node* curr_other = other.head;
+
+	while (curr != nullptr && curr_other != nullptr) {
+
+	}
+
 	other.head = nullptr;
 }
 
@@ -253,8 +253,6 @@ void tratar_caso() {
 	list.merge(other);
 	list.display();
 	cout << endl;
-	other.display();
-	cout << endl;
 }
 
 //@ </answer>
@@ -263,12 +261,20 @@ void tratar_caso() {
 // ----------------------------------------------------------------
 
 int main() {
-	// Leemos el número de casos de prueba que vendrán a continuación
-	int num_casos;
-	cin >> num_casos;
+#ifndef DOMJUDGE
+  std::ifstream in("sample.in");
+  auto cinbuf = std::cin.rdbuf(in.rdbuf());
+#endif
+  
+ int numCasos;
+ cin >> numCasos;
+ while (numCasos--)
+    tratar_caso();
 
-	for (int i = 0; i < num_casos; i++) {
-		tratar_caso();
-	}
-	return 0;
+#ifndef DOMJUDGE
+  std::cin.rdbuf(cinbuf);
+  // Descomentar si se trabaja en Windows
+  // system("PAUSE");
+#endif
+  return 0;
 }

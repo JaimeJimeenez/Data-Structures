@@ -239,15 +239,24 @@ void ListLinkedDouble::detach(Node *node) {
 
 void ListLinkedDouble::partition(int pivot) {
   Node* curr = head->next;
+  Node* lastNode = head->prev;
+  int cont = 0;
+  Node* aux = nullptr;
 
-  while (curr != head) {
+  while (curr != lastNode) {
     if (curr->value > pivot) {
+      aux = curr->next;
       detach(curr);
       attach(curr, head);
-      curr = head->next;
+      curr = aux;
     }
-    else 
+    else
       curr = curr->next;
+  }
+
+  if (curr->value > pivot) {
+    detach(curr);
+    attach(curr, head);
   }
 }
 
