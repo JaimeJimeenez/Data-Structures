@@ -6,32 +6,32 @@
  *         Universidad Complutense de Madrid
  * ---------------------------------------------------
  */
- 
-/*
- * MUY IMPORTANTE: Para realizar este ejercicio solo podéis
- * modificar el código contenido entre las etiquetas <answer>
- * y </answer>. Toda modificación fuera de esas etiquetas está
- * prohibida, pues no se tendrá en cuenta para la corrección.
- *
- * Tampoco esta permitido modificar las líneas que contienen
- * las etiquetas <answer> y </answer>, obviamente :-)
- */
- 
-//@ <answer>
-/*
-  Introduce aquí los nombres de los componentes del grupo:
-  
-  Componente 1:
-  Componente 2:
-*/
-//@ </answer>
+
+ /*
+  * MUY IMPORTANTE: Para realizar este ejercicio solo podéis
+  * modificar el código contenido entre las etiquetas <answer>
+  * y </answer>. Toda modificación fuera de esas etiquetas está
+  * prohibida, pues no se tendrá en cuenta para la corrección.
+  *
+  * Tampoco esta permitido modificar las líneas que contienen
+  * las etiquetas <answer> y </answer>, obviamente :-)
+  */
+
+  //@ <answer>
+  /*
+    Introduce aquí los nombres de los componentes del grupo:
+
+    Componente 1: Jaime Jiménez Nieto
+    Componente 2: Iván Pisonero Díaz
+  */
+  //@ </answer>
 
 #include <iostream>
 #include <cassert>
 #include <fstream>
 #include <cassert>
-#include <list>
 #include <string>
+#include <list>
 
 using namespace std;
 
@@ -39,25 +39,25 @@ using namespace std;
 enum class Categoria { Primero, Segundo, Postre };
 
 struct Plato {
-  Categoria categoria;
-  string nombre;
+    Categoria categoria;
+    string nombre;
 };
 
 // Sobrecarga del operador << para imprimir platos
-ostream &operator<<(ostream &out, const Plato &plato) {
-  switch (plato.categoria) {
+ostream& operator<<(ostream& out, const Plato& plato) {
+    switch (plato.categoria) {
     case Categoria::Primero:
-      out << "1";
-      break;
+        out << "1";
+        break;
     case Categoria::Segundo:
-      out << "2";
-      break;
+        out << "2";
+        break;
     case Categoria::Postre:
-      out << "P";
-      break;
-  }
-  out << " " << plato.nombre;
-  return out;
+        out << "P";
+        break;
+    }
+    out << " " << plato.nombre;
+    return out;
 }
 
 //@ <answer>
@@ -66,70 +66,86 @@ ostream &operator<<(ostream &out, const Plato &plato) {
 // --------------------------------------------------------------
 
 
+// Coste lineal con respecto a platos.size()
+void ordenar_menu(list<Plato>& platos) {
+    auto it = platos.begin(); 
+    auto it2 = platos.begin(); //Apuntará a la posición posterior al último primero procesado
+    int size = platos.size();
+    Plato aux;
 
-void print(const list<Plato> & platos) {
-  
-  for (auto it = platos.begin(); it != platos.end(); ++it) 
-    cout << *it << endl;
+    for (int i = 0; i < size; i++) {
+        if (it->categoria == Categoria::Primero) {
+            it2 = platos.insert(it2, *it);
+            aux = *it;
+            it = platos.erase(it);
 
-  cout << "---\n";
+            if (it2 != platos.end()) {
+                it2++;
+            }
+            
+            if (it->categoria == aux.categoria && it->nombre == aux.nombre) {
+                it = it2;
+            }
+        }
+        else if (it->categoria == Categoria::Postre) {
+            platos.push_back(*it);
+
+            if (it == it2 && it != platos.end()) {
+                it2++;
+            }
+            it = platos.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
+
 }
 
-//erase() devuelve un iterador que apunta al siguiente de la lista
-
-// Indica el coste en función del tamaño del parámetro de entrada
-void ordenar_menu(list<Plato> &platos) {
-  auto itPrimero = platos.begin();
-  auto itSegundo = itPrimero;
-  auto it = platos.begin();
-
-  while (it != platos.end() && it->categoria != Categoria::Postre) {
-    auto itAux = it;
-    if (it->categoria == Categoria::Primero) {
-      itPrimero = platos.insert(platos.begin(), *it);
-      itAux = platos.erase(it);
-      it = itAux;
+Categoria charACat(char c) {
+    Categoria res;
+    switch (c) {
+    case 'P':
+        res = Categoria::Postre;
+        break;
+    case '1':
+        res = Categoria::Primero;
+        break;
+    case '2':
+        res = Categoria::Segundo;
+        break;
     }
-    else if (it->categoria == Categoria::Segundo) {
-      itSegundo = platos.insert(itSegundo, *it);
-      itAux = platos.erase(it);
-      it = itAux;
-    }
-  }
-
-  print(platos);
+    return res;
 }
+
 
 bool tratar_caso() {
-  int N;
-  cin >> N;
-  if (N == 0)
-    return false;
-  
-  list<Plato> menu;
-  char categoria;
-  string nombre;
-  
-  while (N--) {
-    cin >> categoria;
-    getline(cin, nombre);
+    int N;
+    cin >> N;
+    if (N == 0) { return false; }
 
-    switch(categoria) {
-      case '1':
-        menu.push_front({Categoria::Primero, nombre});
-        break;
-      case '2':
-        menu.push_front({Categoria::Segundo, nombre});
-        break;
-      case 'P':
-        menu.push_back({Categoria::Postre, nombre});
-        break;
+    list<Plato> platos;
+    char cat;
+    string nombre;
+
+    while (N > 0) {
+        cin >> cat;
+        getline(cin, nombre);
+        platos.push_back({ charACat(cat) , nombre });
+        N--;
     }
-  }
 
-  ordenar_menu(menu);
-  return true;
+    ordenar_menu(platos);
+
+    for (Plato p : platos) {
+        cout << p << '\n';
+    }
+    cout << "---" << '\n';
+    return true;
 }
+
+
+
 
 //---------------------------------------------------------------
 // No modificar por debajo de esta línea
@@ -139,17 +155,16 @@ bool tratar_caso() {
 
 int main() {
 #ifndef DOMJUDGE
-  std::ifstream in("sample.in");
-  auto cinbuf = std::cin.rdbuf(in.rdbuf());
+    std::ifstream in("sample.in");
+    auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-  
-  while (tratar_caso()) {  }
+
+    while (tratar_caso()) {}
 
 #ifndef DOMJUDGE
-  std::cin.rdbuf(cinbuf);
-  // Descomentar si se trabaja en Windows
-  // system("PAUSE");
+    std::cin.rdbuf(cinbuf);
+    // Descomentar si se trabaja en Windows
+    // system("PAUSE");
 #endif
-  return 0;
+    return 0;
 }
-

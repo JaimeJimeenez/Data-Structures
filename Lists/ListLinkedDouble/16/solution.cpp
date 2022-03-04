@@ -131,7 +131,7 @@ public:
   
   // Nuevo método
   // Se implementa más abajo
-  void swap2by2();
+  void zip(ListLinkedDouble& other);
   
 
 private:
@@ -225,7 +225,7 @@ void ListLinkedDouble::detach(Node *node) {
 
 // No olvides el coste!
 // Coste O(N) con respecto al número de elementos que tiene la lista
-void ListLinkedDouble::zips(ListLinkedDouble &other) {
+void ListLinkedDouble::zip(ListLinkedDouble &other) {
   if (empty()) {
     head = other.head;
     other.head = nullptr;
@@ -242,7 +242,7 @@ void ListLinkedDouble::zips(ListLinkedDouble &other) {
     other.detach(curr_other);
     attach(curr_other, curr->next);
     curr_other = aux;
-    curr = curr->next;
+    curr = curr->next->next;
   }
 
   if (curr_other != other.head) {
@@ -253,7 +253,7 @@ void ListLinkedDouble::zips(ListLinkedDouble &other) {
 
 //}}}  
 
-bool tratar_caso() {
+void tratar_caso() {
   
   int N, value;
   ListLinkedDouble list;
