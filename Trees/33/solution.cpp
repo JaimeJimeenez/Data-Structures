@@ -16,15 +16,6 @@
  * Tampoco esta permitido modificar las líneas que contienen
  * las etiquetas <answer> y </answer>, obviamente :-)
  */
- 
-//@ <answer>
-/*
-  Introduce aquí los nombres de los componentes del grupo:
-  
-  Componente 1:
-  Componente 2:
-*/
-//@ </answer>
 
 #include <iostream>
 #include <cassert>
@@ -33,6 +24,7 @@
 #include <utility>
 #include <tuple>
 #include <algorithm>
+#include <string>
 
 template <class T> class BinTree {
 public:
@@ -131,36 +123,33 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-template<typename T>
-int altura(const BinTree<T> &arbol) {
-  if (arbol.empty())
-    return 0;
-  return 1 + max(altura(arbol.left()), altura(arbol.right()));
+int num_nodos(const BinTree<int>& t) {
+    if (t.empty())
+        return 0;
+    return 1 + num_nodos(t.left()) + num_nodos(t.right());
 }
 
-// No olvides el coste!
-template <typename T>
-bool estable_altura(const BinTree<T> &arbol) {
-  if (arbol.empty())
-    return true;
+pair<bool, int> es_zurdo_aux(const BinTree<int>& t) {
+    if (t.empty())
+        return { true, 0 };
+    else {
+        if (t.left().empty() && t.right().empty())
+            return {true, 1};
+        auto izq [es_zurdoIz, num_nodos_izq] = es_zurdo_aux(t.left());
+        auto [es_zurdoDer, num_nodos_Der] = es_zurdo_aux(t.right());
 
-  int alturaIzq = altura(arbol.left());
-  int alturaDer = altura(arbol.right());
-
-  if (arbol.left().empty() || arbol.right().empty())
-    return false;
-  if (alturaIzq > alturaDer)
-    return estable_altura(arbol.left());
-  else if (alturaDer > alturaIzq)
-    return estable_altura(arbol.right());
-
-  return true;
+        return { es_zurdoIz && es_zurdo_der && num_nodos(t.left()) > num_nodos(t.right()), num_nodos(t.left()) + num_nodos(t.right()) + 1 };
+    }
 }
 
-// Función para tratar un caso de prueba
+bool es_zurdo(const BinTree<int> t) {
+    return es_zurdo_aux(t).first;
+}
+
+// Función que trata un caso de prueba
 void tratar_caso() {
-  BinTree<int> t = read_tree<int>(cin);
-  cout << (estable_altura(t) ? "SI" : "NO") << "\n";
+   BinTree<char> t = read_tree<char>(cin);
+   cout << (es_zurdo(t) ? "SI" : "NO") << endl;
 }
 
 
@@ -175,12 +164,11 @@ int main() {
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-  int num_casos;
-  cin >> num_casos;
-  
-  for (int i = 0; i < num_casos; i++) {
+  int numCasos;
+  cin >> numCasos;
+
+  while (numCasos--)
     tratar_caso();
-  }
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);

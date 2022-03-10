@@ -16,15 +16,6 @@
  * Tampoco esta permitido modificar las líneas que contienen
  * las etiquetas <answer> y </answer>, obviamente :-)
  */
- 
-//@ <answer>
-/*
-  Introduce aquí los nombres de los componentes del grupo:
-  
-  Componente 1:
-  Componente 2:
-*/
-//@ </answer>
 
 #include <iostream>
 #include <cassert>
@@ -33,6 +24,7 @@
 #include <utility>
 #include <tuple>
 #include <algorithm>
+#include <string>
 
 template <class T> class BinTree {
 public:
@@ -131,36 +123,38 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
+struct Rescate {
+    int excursionistas, grupo;
+    bool hayExc;
+};
+
 template<typename T>
-int altura(const BinTree<T> &arbol) {
-  if (arbol.empty())
-    return 0;
-  return 1 + max(altura(arbol.left()), altura(arbol.right()));
+Rescate rescate(const BinTree<T> &arbol) {
+    if (arbol.empty()) {
+        return { 0, 0, false };
+    }
+
+    Rescate rescIzq = rescate(arbol.left());
+    Rescate rescDer = rescate(arbol.right());
+
+    if (arbol.root() == 0) {
+        if (rescIzq.hayExc || rescDer.hayExc) 
+            return {rescIzq.grupo + rescDer.grupo, std::max(rescIzq.excursionistas, rescDer.excursionistas), true};
+        else
+            return { 0, 0, false };
+    }
+
+    if (rescIzq.hayExc || rescDer.hayExc) 
+        return { rescIzq.grupo + rescDer.grupo, std::max(rescIzq.excursionistas + arbol.root(), rescDer.excursionistas + arbol.root()), true};
+
+    return {1, std::max(rescIzq.excursionistas + arbol.root(), rescDer.excursionistas + arbol.root()), true};
 }
 
-// No olvides el coste!
-template <typename T>
-bool estable_altura(const BinTree<T> &arbol) {
-  if (arbol.empty())
-    return true;
-
-  int alturaIzq = altura(arbol.left());
-  int alturaDer = altura(arbol.right());
-
-  if (arbol.left().empty() || arbol.right().empty())
-    return false;
-  if (alturaIzq > alturaDer)
-    return estable_altura(arbol.left());
-  else if (alturaDer > alturaIzq)
-    return estable_altura(arbol.right());
-
-  return true;
-}
-
-// Función para tratar un caso de prueba
+// Función que trata un caso de prueba
 void tratar_caso() {
-  BinTree<int> t = read_tree<int>(cin);
-  cout << (estable_altura(t) ? "SI" : "NO") << "\n";
+   BinTree<int> t = read_tree<int>(cin);
+   Rescate rescTotal = rescate(t);
+   cout << rescTotal.grupo << " " << rescTotal.grupo << endl;
 }
 
 
@@ -175,12 +169,11 @@ int main() {
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-  int num_casos;
-  cin >> num_casos;
-  
-  for (int i = 0; i < num_casos; i++) {
+  int numCasos;
+  cin >> numCasos;
+
+  while (numCasos--)
     tratar_caso();
-  }
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);
