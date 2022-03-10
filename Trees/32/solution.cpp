@@ -124,37 +124,35 @@ using namespace std;
 // --------------------------------------------------------------
 
 struct Rescate {
-    int excursionistas, grupo;
+    int grupo, excursionistas;
     bool hayExc;
 };
 
 template<typename T>
 Rescate rescate(const BinTree<T> &arbol) {
-    if (arbol.empty()) {
-        return { 0, 0, false };
-    }
+  if (arbol.empty())
+    return { 0, 0, false };
 
-    Rescate rescIzq = rescate(arbol.left());
-    Rescate rescDer = rescate(arbol.right());
+  Rescate izq = rescate(arbol.left());
+  Rescate der = rescate(arbol.right());
 
-    if (arbol.root() == 0) {
-        if (rescIzq.hayExc || rescDer.hayExc) 
-            return {rescIzq.grupo + rescDer.grupo, std::max(rescIzq.excursionistas, rescDer.excursionistas), true};
-        else
-            return { 0, 0, false };
-    }
+  if (arbol.root() == 0) {
+    if (izq.hayExc || der.hayExc)
+      return {izq.grupo + der.grupo, max(izq.excursionistas, der.excursionistas), true};
+    else
+      return {0, 0, false};
+  }
+  if (der.hayExc || izq.hayExc) 
+    return {izq.grupo + der.grupo, max(izq.excursionistas + arbol.root(), der.excursionistas + arbol.root()), true};
 
-    if (rescIzq.hayExc || rescDer.hayExc) 
-        return { rescIzq.grupo + rescDer.grupo, std::max(rescIzq.excursionistas + arbol.root(), rescDer.excursionistas + arbol.root()), true};
-
-    return {1, std::max(rescIzq.excursionistas + arbol.root(), rescDer.excursionistas + arbol.root()), true};
+  return {1, max(izq.excursionistas + arbol.root(), der.excursionistas + arbol.root()), true};
 }
 
 // Función que trata un caso de prueba
 void tratar_caso() {
    BinTree<int> t = read_tree<int>(cin);
    Rescate rescTotal = rescate(t);
-   cout << rescTotal.grupo << " " << rescTotal.grupo << endl;
+   cout << rescTotal.grupo << " " << rescTotal.excursionistas << endl;
 }
 
 
