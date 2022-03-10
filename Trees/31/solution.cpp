@@ -25,6 +25,7 @@
 #include <tuple>
 #include <algorithm>
 #include <string>
+#include <math.h>
 
 template <class T> class BinTree {
 public:
@@ -123,16 +124,28 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
+template<typename T>
+int num_nodos(const BinTree<T> &tree) {
+  if (tree.empty())
+    return 0;
+  return 1 + num_nodos(tree.left()) + num_nodos(tree.right());
+}
+
+template<typename T>
+int altura(const BinTree<T> &tree) {
+  if (tree.empty())
+    return 0;
+  return 1 + max(altura(tree.left()), altura(tree.right()));
+}
+
 bool es_completo(const BinTree<char> &tree) {
-    if (tree.empty())
-        return true;
-    return true;
+  return num_nodos(tree) == (pow(2, altura(tree)) - 1);
 }
 
 // Función que trata un caso de prueba
 void tratar_caso() {
    BinTree<char> t = read_tree<char>(cin);
-   cout << (es_completo(t) ? "YES" : "NO" ) << endl;
+   cout << (es_completo(t) ? "SI" : "NO" ) << endl;
 }
 
 
