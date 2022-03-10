@@ -131,36 +131,31 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-// Se necesita conocer la altura del arbol
-template <typename T>
-int altura(const BinTree<T> &arbol) {
+// Se podría resolver calculando el numero de hojas y el numero de nodos que tiene cada altura
+// Primer componente: Numero de nodos
+// Segundo componente: Altura
+
+template<typename T>
+int num_nodos(const BinTree<T> &arbol) {
   if (arbol.empty())
     return 0;
+  if (arbol.left().empty() && arbol.right().empty())
+    return 1;
+  
+  return num_nodos(arbol.left()) + num_nodos(arbol.right());
+}
 
-  return 1 + max(altura(arbol.right()), altura(arbol.left()));
+template<typename T>
+pair<int, int> altura_nodos(const BinTree<T> &arbol) {
+  if (arbol.empty())
+    return {0, 0};
+  
 }
 
 // No olvides el coste!
 template <typename T>
 bool estable_altura(const BinTree<T> &arbol) {
-  if (arbol.empty())
-    return true;
-  if (arbol.left().empty() || arbol.right().empty())
-    return false;
-  if (altura(arbol.left()) == altura(arbol.right()))
-    return true;
-  if (altura(arbol.left()) > altura(arbol.right())) {
-    cout << altura(arbol.left()) << endl;
-    cout << altura(arbol.right()) << endl;
-    cout << arbol.left() << endl;
-    return estable_altura(arbol.left());
-  }
-  else {
-    cout << altura(arbol.left()) << endl;
-    cout << altura(arbol.right()) << endl;
-    return estable_altura(arbol.right());
-  }
-    
+  return altura_nodos(arbol).first != 1;
 }
 
 // Función para tratar un caso de prueba
@@ -177,10 +172,10 @@ void tratar_caso() {
 
 
 int main() {
-/*#ifndef DOMJUDGE
+#ifndef DOMJUDGE
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
-#endif*/
+#endif
   int num_casos;
   cin >> num_casos;
   
@@ -188,11 +183,11 @@ int main() {
     tratar_caso();
   }
 
-/*#ifndef DOMJUDGE
+#ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);
   // Descomentar si se trabaja en Windows
   // system("PAUSE");
-#endif*/
+#endif
   return 0;
 }
 
