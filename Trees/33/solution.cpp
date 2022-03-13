@@ -123,26 +123,28 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-int num_nodos(const BinTree<int>& t) {
-    if (t.empty())
+template<typename T>
+int num_nodos(const BinTree<T> &arbol) {
+    if (arbol.empty())
         return 0;
-    return 1 + num_nodos(t.left()) + num_nodos(t.right());
+    return 1 + num_nodos(arbol.left()) + num_nodos(arbol.right());
 }
 
-pair<bool, int> es_zurdo_aux(const BinTree<int>& t) {
-    if (t.empty())
-        return { true, 0 };
-    else {
-        if (t.left().empty() && t.right().empty())
-            return {true, 1};
-        auto izq [es_zurdoIz, num_nodos_izq] = es_zurdo_aux(t.left());
-        auto [es_zurdoDer, num_nodos_Der] = es_zurdo_aux(t.right());
+template<typename T>
+pair<bool, int> es_zurdo_aux(const BinTree<T>& arbol) {
+  if (arbol.empty())
+    return { true, 0 };
+  if (arbol.left().empty() && arbol.right().empty())
+    return { true, 1 };
 
-        return { es_zurdoIz && es_zurdo_der && num_nodos(t.left()) > num_nodos(t.right()), num_nodos(t.left()) + num_nodos(t.right()) + 1 };
-    }
+  auto [es_zurdo_izq, nodos_izq] = es_zurdo_aux(arbol.left());
+  auto [es_zurdo_der, nodos_der] = es_zurdo_aux(arbol.right());
+
+  return { es_zurdo_izq && es_zurdo_der && nodos_izq > nodos_der, 1 + nodos_izq + nodos_der };  
 }
 
-bool es_zurdo(const BinTree<int> t) {
+template<typename T>
+bool es_zurdo(const BinTree<T> t) {
     return es_zurdo_aux(t).first;
 }
 
