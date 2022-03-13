@@ -133,7 +133,6 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-//Coste O(n) siendo n el número de elementos del arbol
 template <typename T>
 std::pair<bool, int>estableEnAltura_altura(const BinTree<T>& arbol) {
     if (arbol.empty())
@@ -144,15 +143,12 @@ std::pair<bool, int>estableEnAltura_altura(const BinTree<T>& arbol) {
     auto [estable_dr, alt_dr] = estableEnAltura_altura(arbol.right());
     auto [estable_iz, alt_iz] = estableEnAltura_altura(arbol.left());
 
-    if (alt_dr == alt_iz) {
-        return{ true, 1 + alt_dr };
-    }
-    else if (alt_dr > alt_iz) {
-        return{ estable_dr, 1 + alt_dr };
-    }
-    else {
-        return{ estable_iz, 1 + alt_iz };
-    }
+    if (alt_dr == alt_iz) 
+        return { true, 1 + alt_dr };
+    else if (alt_dr > alt_iz) 
+        return { estable_dr, 1 + alt_dr };
+    else 
+        return { estable_iz, 1 + alt_iz };
 }
 
 // Coste lineal con respecto al número de nodos de arbol
