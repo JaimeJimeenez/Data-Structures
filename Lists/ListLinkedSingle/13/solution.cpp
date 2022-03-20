@@ -78,7 +78,7 @@ public:
         display(std::cout);
     }
 
-    void reverse_segment(int init, int fin);
+    void reverse();
 
 private:
     Node* head;
@@ -185,42 +185,38 @@ void ListLinkedSingle::display(std::ostream& out) const {
     out << "]";
 }
 
-void ListLinkedSingle::reverse_segment(int init, int fin) {
-
+void ListLinkedSingle::reverse() {
     if (empty())
         return;
     
-    Node* curr = head;
     Node* prev = nullptr;
+    Node* aux = nullptr;
+    Node* curr = head;
 
-    //Posicionando el nodo inicial que se va a invertir
-    while (init--) {
+    while (curr != nullptr) {
+        aux = curr->next;
+        curr->next = prev;
         prev = curr;
-        curr = curr->next;
+        curr = aux;
     }
 
-    
+    head = prev;
 }
 
-bool tratar_caso() {
+
+void tratar_caso() {
     ListLinkedSingle list;
-    int N, P, L;
-    cin >> N >> P >> L;
-
-    if (!cin)
-        return false;
-    
     int value;
-    while (N--) {
-        cin >> value;
-        list.push_back(value);
-    }
+    cin >> value;
 
-    list.reverse_segment(P, L + P);
+    while (value != 0) {
+        list.push_back(value);
+        cin >> value;
+    }
+    
+    list.reverse();
     list.display();
     cout << endl;
-
-    return true;
 }
 
 
@@ -230,7 +226,11 @@ int main() {
     auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
 
-    while (tratar_caso());
+    int num_casos;
+    cin >> num_casos;
+    for (int i = 0; i < num_casos; i++) {
+        tratar_caso();
+    }
 
 #ifndef DOMJUDGE
     std::cin.rdbuf(cinbuf);

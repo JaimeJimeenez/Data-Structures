@@ -198,10 +198,34 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
+// Hallar la maxima diferencia entre el arbol izquierdo
+// Suponiendo que el árbol mínimo será de tamaño 2, se buscará el primer elemento del árbol izquierdo para restarlo a la raiz del árbol original y el último elemento
+// del árbol izquierdo para restarlo a la raíz del árbol derecho
+// Primer componente: Maxima diferencia del arbol correspondiente
+// Segundo componente: Elemento del árbol
+tuple<int, int, int> maxima_diferencia_aux(const BinTree<int> &arbol) {
+  if (arbol.empty())
+    return { -1, -1, -1 };
+  if (arbol.left().empty() && arbol.right().empty())
+    return { -1, arbol.root(), arbol.root() };
+ 
+  auto [diffIzq, primIzq, ultIzq] = maxima_diferencia_aux(arbol.left());
+  cout << "Diff: "<< diffIzq << endl;
+  int prim = diffIzq != -1 ? arbol.root() : primIzq;
+  int dif_izq = abs(prim - arbol.root());
+  cout << "Diff_izq: " << dif_izq << endl;
+  auto [diffDer, primDer, ultDer] = maxima_diferencia_aux(arbol.right());
+  int ult = diffDer != -1 ? arbol.root() : ultDer;
+  int dif_der = abs(ult - prim);
+  cout << "Diff_der: " << dif_der << endl;
+  cout << "Arbol root: " << arbol.root() << " Prim: " << prim << " Ult: " << ult << endl;
+  return { max(prim, ult), prim, ult };
+}
+
 // No olvides el coste!
 // Coste O(N) siendo N el número de nodos del arbol
 int maxima_diferencia(const BinTree<int> &t) {
-  
+  return get<0>(maxima_diferencia_aux(t));
 }
 
 // Función para tratar un caso de prueba

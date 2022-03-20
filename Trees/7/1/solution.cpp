@@ -198,8 +198,7 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-// No olvides el coste!
-// Coste O(N) siendo N el número de nodos del arbol
+//Coste O(N) siendo N el número de elementos del arbol.
 int maxima_diferencia(const BinTree<int> &t) {
   int elem = t.root();
   int diff = 0;
