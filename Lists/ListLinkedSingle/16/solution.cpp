@@ -207,27 +207,42 @@ void ListLinkedSingle::display(std::ostream &out) const {
 // Implementa a continuación el método pedido.
 
 void ListLinkedSingle::merge(ListLinkedSingle& other) {
-	if (other.empty()) 
+	if (other.empty())
 		return;
 	if (empty()) {
 		head = other.head;
 		other.head = nullptr;
 		return;
 	}
-	
-	Node* curr = head;
-	Node* curr_other;
 
-	if (head->value > other.head->value) {
-		curr = curr->next;
-		head = other.head;
+	Node* curr = head;
+	Node* prev = nullptr;
+
+	if (curr->value >= other.head->value) {
+		Node* aux = other.head;
+		other.head = other.head->next;
+		head = aux;
+		head->next = curr;
+		prev = head;
 	}
 
-	Node* curr = head;
-	Node* curr_other = other.head;
+	while (curr != nullptr && other.head != nullptr) {
+		if (curr->value >= other.head->value) {
+			Node* aux = other.head;
+			other.head = other.head->next;
+			prev->next = aux;
+			aux->next = curr;
+			prev = aux;
+		}
+		else {
+			prev = curr;
+			curr = curr->next;
+		}
+	}
 
-	while (curr != nullptr && curr_other != nullptr) {
-
+	if (curr == nullptr && other.head != nullptr) {
+		Node* aux = other.head;
+		prev->next = aux;
 	}
 
 	other.head = nullptr;
