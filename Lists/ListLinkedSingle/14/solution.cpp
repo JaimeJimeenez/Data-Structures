@@ -78,7 +78,7 @@ public:
         display(std::cout);
     }
 
-    void reverse_segment(int init, int fin);
+    void reverse();
 
 private:
     Node* head;
@@ -185,61 +185,38 @@ void ListLinkedSingle::display(std::ostream& out) const {
     out << "]";
 }
 
-void ListLinkedSingle::reverse_segment(int init, int fin) {
-   int cont = 0;
-   Node* curr = head;
-   Node* prev = head;
-   
-    while (cont != init) {
-        prev = curr;
-        curr = curr->next;
-        cont++;
-    }
-
-    cont = 0;
-    Node* prevFin = head;
-    Node* finNode = head;
-    while (cont != fin && finNode->next != nullptr) {
-        prevFin = finNode;
-        finNode = finNode->next;
-        cont++;
-    }
-
-    prev->next = finNode;
-    prevFin->next = nullptr;
+void ListLinkedSingle::reverse() {
+    if (empty())
+        return;
     
-    Node* aux = curr;
-    while (aux  != nullptr) {
-        cout << aux->value << ", ";
-        aux = aux->next;
-    }
-    cout << endl;
+    Node* prev = nullptr;
+    Node* aux = nullptr;
+    Node* curr = head;
 
-    cout << prev->value << endl;
-    cout << curr->value << endl;
-    cout << prevFin->value << endl;
-    cout << finNode->value << endl;
+    while (curr != nullptr) {
+        aux = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = aux;
+    }
+
+    head = prev;
 }
 
-bool tratar_caso() {
+
+void tratar_caso() {
     ListLinkedSingle list;
-    int N, P, L;
-    cin >> N >> P >> L;
-
-    if (!cin)
-        return false;
-    
     int value;
-    while (N--) {
-        cin >> value;
-        list.push_back(value);
-    }
+    cin >> value;
 
-    list.reverse_segment(P, L + P);
+    while (value != 0) {
+        list.push_back(value);
+        cin >> value;
+    }
+    
+    list.reverse();
     list.display();
     cout << endl;
-
-    return true;
 }
 
 
@@ -249,7 +226,11 @@ int main() {
     auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
 
-    while (tratar_caso());
+    int num_casos;
+    cin >> num_casos;
+    for (int i = 0; i < num_casos; i++) {
+        tratar_caso();
+    }
 
 #ifndef DOMJUDGE
     std::cin.rdbuf(cinbuf);

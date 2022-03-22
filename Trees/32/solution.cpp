@@ -25,7 +25,6 @@
 #include <tuple>
 #include <algorithm>
 #include <string>
-#include <math.h>
 
 template <class T> class BinTree {
 public:
@@ -124,28 +123,43 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-template<typename T>
-int num_nodos(const BinTree<T> &tree) {
-  if (tree.empty())
-    return 0;
-  return 1 + num_nodos(tree.left()) + num_nodos(tree.right());
-}
 
 template<typename T>
-int altura(const BinTree<T> &tree) {
-  if (tree.empty())
-    return 0;
-  return 1 + max(altura(tree.left()), altura(tree.right()));
-}
+T minimo(const BinTree<T> &tree) {
+    if (tree.left().empty() && tree.right().empty())
+        return tree.root();
 
-bool es_completo(const BinTree<char> &tree) {
-  return num_nodos(tree) == (pow(2, altura(tree)) - 1);
+    T elem = tree.root();
+
+    if (!tree.left().empty()) {
+        T minimIzq = minimo(tree.left());
+        elem = std::min(elem, minimIzq);
+    }
+
+    if (!tree.right().empty()) {
+        T minimDer = minimo(tree.right());
+        elem = std::min(elem, minimDer);
+    }
+    
+    return elem;
 }
 
 // Función que trata un caso de prueba
-void tratar_caso() {
-   BinTree<char> t = read_tree<char>(cin);
-   cout << (es_completo(t) ? "SI" : "NO" ) << endl;
+bool tratar_caso() {
+    char c;
+    cin >> c;
+    if (!cin)
+        return false;
+    
+    if (c == 'N') {
+        BinTree<int> t = read_tree<int>(cin);
+        cout << minimo(t) << endl;
+    }
+    else {
+        BinTree<std::string> t= read_tree<std::string>(cin);
+        cout << minimo(t) << endl;
+    }
+    return true;
 }
 
 
@@ -160,11 +174,8 @@ int main() {
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-  int numCasos;
-  cin >> numCasos;
-
-  while (numCasos--)
-    tratar_caso();
+  
+  while (tratar_caso());
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);
