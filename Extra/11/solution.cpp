@@ -162,19 +162,6 @@ bool tratar_caso() {
     return true;
 }
 
-void solucion() {
-    int peliculas, h1, m1, s1, h2, m2, s2;
-    char c;
-    string titulo;
-    vector<Pelicula> v;
-
-    cin >> peliculas;
-    while (peliculas != 0) {
-        
-        cin >> peliculas;
-    }
-}
-
 int main() {
 #ifndef DOMJUDGE
   std::ifstream in("sample.in");
