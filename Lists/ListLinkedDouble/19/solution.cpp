@@ -228,7 +228,6 @@ void ListLinkedDouble::detach(Node *node) {
 void ListLinkedDouble::zip(ListLinkedDouble &other) {
   if (empty()) {
     head = other.head;
-    other.head = nullptr;
     return;
   }
   if (other.empty())
@@ -245,10 +244,13 @@ void ListLinkedDouble::zip(ListLinkedDouble &other) {
     curr = curr->next->next;
   }
 
-  if (curr_other != other.head) {
-    head->prev = curr_other;
-    other.head->prev->next = head;
-    other.head = nullptr;
+  if (curr_other != other.head && curr == head) {
+    while (curr_other != other.head) {
+      Node* aux = curr_other->next;
+      other.detach(curr_other);
+      attach(curr_other, head);
+      curr_other = aux;
+    }
   }
 }
 
@@ -284,20 +286,20 @@ void tratar_caso() {
 
 
 int main() {
-/*#ifndef DOMJUDGE
+#ifndef DOMJUDGE
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
-#endif*/
+#endif
   
   int numCasos;
   cin >> numCasos;
-  while (numCasos--)
+  for (int i = 0; i < numCasos; i++)
     tratar_caso();
 
-/*#ifndef DOMJUDGE
+#ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);
   // Descomentar si se trabaja en Windows
   // system("PAUSE");
-#endif*/
+#endif
   return 0;
 }

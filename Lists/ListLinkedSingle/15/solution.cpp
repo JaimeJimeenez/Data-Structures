@@ -185,44 +185,27 @@ void ListLinkedSingle::display(std::ostream& out) const {
     out << "]";
 }
 
-void ListLinkedSingle::reverse_segment(int init, int fin) {
-    int cont = 1;
+void ListLinkedSingle::reverse_segment(int init, int end) {
     Node* prev = nullptr;
     Node* curr = head;
-
-    if (init == 0) 
-        prev = head;
-    else {
-        while (init--) {
-            prev = curr;
-            curr = curr->next;
-        }
+    
+    while (init--) {
+        prev = curr;
+        curr = curr->next;
     }
 
-    Node* finNode =  curr;
-    Node* sig = finNode->next;
-    while (cont != fin) {
-        finNode = finNode->next;
-        sig = finNode->next;
-        cont++;
+    if (curr == head) {
+        head = prev;
     }
 
-    prev->next = curr->next;
-    finNode->next = curr;
-    curr->next = sig;
-    /*while (fin--) {
-        Node* aux = curr->next;
-        curr->next = sig;
-        prev->next = aux;
-        finNode->next = curr;
-        sig = curr;
-        curr = aux;
-        display();
-    }*/
-    cout << prev->value << endl;
-    cout << finNode->value << endl;
-    if (sig != nullptr)
-        cout << sig->value << endl;
+    Node* fin = curr;
+    Node* sig = curr->next;
+    while (end--) {
+        fin = fin->next;
+        sig = fin->next;
+    }
+    
+    
 }
 
 bool tratar_caso() {
