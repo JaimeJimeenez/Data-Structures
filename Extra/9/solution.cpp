@@ -1,10 +1,10 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <algorithm>
+#include <vector>
 
 using namespace std;
-
-const int MAX = 1000;
 
 class Hora {
 private:
@@ -12,10 +12,13 @@ private:
 
 public:
     Hora() { };
-    Hora(int horas, int minutos, int segundos) : horas(horas), minutos(minutos), segundos(segundos) { };
+    Hora(int h, int m, int s) : horas(h), minutos(m), segundos(s) {
+        if (h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59)
+            throw invalid_argument("ERROR");
+    };
 
     bool operator<(Hora const& other) const {
-        return (3600 * horas + 60 * minutos + segundos) <= (3600 * other.horas + 60 * other.minutos + other.segundos);
+        return (3600 * horas + 60 * minutos + segundos) < (3600 * other.horas + 60 * other.minutos + other.segundos) ;
     }
 
     int getHoras() const { return horas; }
@@ -24,43 +27,37 @@ public:
 
 };
 
-inline std::ostream& operator<<(std::ostream& out, const Hora& h) {
-    out << setfill('0') << setw(2) << h.getHoras() << ":" << setfill('0') << setw(2) << h.getMinutos() << ":" << setfill('0') << setw(2) << h.getSegundos() << endl;
-    return out;
+void print(Hora const& hora) {
+    cout << setfill('0') << setw(2) << hora.getHoras() << ':' << setfill('0') << setw(2) << hora.getMinutos() << ':' << setfill('0') << setw(2) << hora.getSegundos();
 }
+
 bool tratar_caso() {
     int nTrenes, nHoras;
     cin >> nTrenes >> nHoras;
     if (nTrenes == 0 && nHoras == 0)
         return false;
     
-    Hora v[MAX];
+    vector<Hora> trenes(nTrenes);
     int horas, minutos, segundos;
     char c;
-    bool encontrado = false;
-    int j = 0;
 
     for (int i = 0; i < nTrenes; i++) {
         cin >> horas >> c >> minutos >> c >> segundos;
-        v[i] = {horas, minutos, segundos};
+        trenes[i] = { horas, minutos, segundos };
     }
 
-    while (nHoras--) {
+    for (int i = 0; i < nHoras; i++) {
         cin >> horas >> c >> minutos >> c >> segundos;
-        Hora hActual(horas, minutos, segundos);
-        int j = 0;
-        while (!encontrado && j < nTrenes) {
-            if (hActual < v[j]) {
-                cout << v[j];
-                encontrado = true;
-            }
-            j++;
-        }
-        if (!encontrado)
-            cout << "NO\n";
-        encontrado = false;
+        Hora actual = { horas, minutos, segundos };
+        auto lower = lower_bound(trenes.begin(), trenes.end(), actual);
+        
+        if (lower == trenes.end())
+            cout << "NO";
+        else
+            print(*lower);
+        
+        cout << "\n";
     }
-
     cout << "---\n";
     return true;
 }
