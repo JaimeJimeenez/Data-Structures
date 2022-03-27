@@ -15,26 +15,17 @@ private:
 public:
     Polinomio() { };
 
-    int binarySearch(int init, int fin, const monomio& monomio) {
-        if (init == fin)
-            return init;
-        else {
-            int mitad = (init + fin) / 2;
-            if (monomios[mitad].second > monomio.second)
-                return binarySearch(init, mitad, monomio);
-            else if (monomios[mitad].second < monomio.second)
-                return binarySearch(mitad + 1, fin, monomio);
-            else {
-                monomios[mitad].first += monomio.first;
-                return -1;
-            }
+    void anyadir_monomio(const monomio& nuevoMonomio) {
+        if (nuevoMonomio.first != 0) {
+            auto it = lower_bound(monomios.begin(), monomios.end(), nuevoMonomio, 
+                [](const monomio& m, const monomio& r) {
+                return m.second < r.second;
+            });
+            if (it >= monomios.begin() && it < monomios.end() && nuevoMonomio.second == (*it).second)
+                (*it).first += nuevoMonomio.first;
+            else
+                monomios.insert(it, nuevoMonomio);
         }
-    }
-
-    void anyadir_monomio(const monomio& monomio) {
-        int pos = binarySearch(0, monomios.size(), monomio);
-        if (pos != -1)
-            monomios.insert(monomios.begin() + pos, monomio);
     }
 
     int evaluar(int valor) const {
