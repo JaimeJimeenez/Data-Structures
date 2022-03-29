@@ -146,35 +146,54 @@ template <typename T> BinTree<T> read_tree(std::istream &in) {
 using namespace std;
 
 template<typename T>
-tuple<bool T, T> binaray_search_aux(const BinTree<T> & arbol) {
-    if (arbol.empty())
-        return { true, T(), T() };
+tuple<bool, T, T> binary_search_aux(const BinTree<T> & arbol) {
+  if (arbol.empty())
+    return { true, T(), T() };
     
-    auto [abb_izq, min_izq, max_izq] = binaray_search_aux(arbol.left());
-    auto [abb_der, min_der, max_der] = binaray_search_aux(arbol.rigth());
+  auto [abb_izq, min_izq, max_izq] = binary_search_aux(arbol.left());
+  auto [abb_der, min_der, max_der] = binary_search_aux(arbol.right());
 
-    T menor = arbol.left().empty() ? arbol.root() : menor_izq;
-    T mayor = arbol.right().empty() ? arbol.root() : mayor_der;
-    bool es_abb = abb_izq && abb_der && arbol.root() > max_izq && arbol.root() < min_izq;
+  T menor = arbol.left().empty() ? arbol.root() : min_izq;
+  T mayor = arbol.right().empty() ? arbol.root() : max_der;
+  bool es_abb = abb_izq && abb_der && (arbol.left().empty() || max_izq < arbol.root()) && (arbol.right().empty() || arbol.root() < min_der);
 
-    return [es_abb, menor, mayor];
+  return { es_abb, menor, mayor };
 }
 
 template<typename T>
 bool binary_search(const BinTree<T> &arbol) {
-    return get<0>(binaray_search_aux(arbol));
+    return get<0>(binary_search_aux(arbol));
 }
 
-void tratar_caso() {
+bool tratar_caso() {
+  char c;
+  cin >> c;
+  if (!cin) return false;
+
+  if (c == 'N') {
     BinTree<int> t = read_tree<int>(cin);
     cout << (binary_search(t) ? "SI" : "NO") << endl;
+  }
+  else {
+    BinTree<string> t = read_tree<string>(cin);
+    cout << (binary_search(t) ? "SI" : "NO") << endl;
+  }
+
+  return true;
 }
 
 int main() {
+#ifndef DOMJUDGE
+  std::ifstream in("sample.in");
+  auto cinbuf = std::cin.rdbuf(in.rdbuf());
+#endif
 
-    int num_casos;
-    cin >> num_casos;
+  while (tratar_caso()) { }
 
-    while (num_casos--)
-        tratar_caso();
+#ifndef DOMJUDGE
+  std::cin.rdbuf(cinbuf);
+  // Descomentar si se trabaja en Windows
+  // system("PAUSE");
+#endif
+  return 0;
 }
