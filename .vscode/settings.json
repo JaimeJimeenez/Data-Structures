@@ -6,7 +6,8 @@
         "utility": "cpp",
         "ostream": "cpp",
         "xlocale": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "xstring": "cpp"
     },
     "C_Cpp.default.cppStandard": "c++17",
     "C_Cpp.default.cStandard": "c17"
