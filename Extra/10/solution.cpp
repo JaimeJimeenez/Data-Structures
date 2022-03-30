@@ -1,58 +1,65 @@
 #include <iostream>
-#include <math.h>
+#include <iomanip>
 #include <fstream>
+#include <algorithm>
+#include <vector>
 
 using namespace std;
 
-class Complejo {
+class Hora {
 private:
-    float real, imaginaria;
+    int horas, minutos, segundos;
 
 public:
-    Complejo() { };
-    Complejo(float r, float i) : real(r), imaginaria(i) { };
+    Hora() { };
+    Hora(int h, int m, int s) : horas(h), minutos(m), segundos(s) {
+        if (h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59)
+            throw invalid_argument("ERROR");
+    };
 
-    Complejo operator+(Complejo const& other) const {
-        float r = real + other.real;
-        float i = imaginaria + other.imaginaria;
-
-        return { r, i };
+    bool operator<(Hora const& other) const {
+        return (3600 * horas + 60 * minutos + segundos) < (3600 * other.horas + 60 * other.minutos + other.segundos) ;
     }
 
-    Complejo operator*(Complejo const& other) const {
-        float r = (real * other.real) - (imaginaria * other.imaginaria);
-        float i = (real * other.imaginaria) + (other.real * imaginaria);
+    int getHoras() const { return horas; }
+    int getMinutos() const { return minutos; }
+    int getSegundos() const { return segundos; }
 
-        return { r, i };
-    }
-
-    float getReal() const { return real; };
-    float getImaginaria() const { return imaginaria; };
-
-    int modulo() { return sqrt(pow(real, 2) + pow(imaginaria, 2)); };
 };
 
-bool esModulo(const Complejo& complejo, int it) {
-    int i = 1;
-    Complejo z(0, 0);
+void print(Hora const& hora) {
+    cout << setfill('0') << setw(2) << hora.getHoras() << ':' << setfill('0') << setw(2) << hora.getMinutos() << ':' << setfill('0') << setw(2) << hora.getSegundos();
+}
 
-    while(i < it) {
-        z = z * z + complejo;
-        if (z.modulo() > 2)
-            return false;
-        i++;    
+bool tratar_caso() {
+    int nTrenes, nHoras;
+    cin >> nTrenes >> nHoras;
+    if (nTrenes == 0 && nHoras == 0)
+        return false;
+    
+    vector<Hora> trenes(nTrenes);
+    int horas, minutos, segundos;
+    char c;
+
+    for (int i = 0; i < nTrenes; i++) {
+        cin >> horas >> c >> minutos >> c >> segundos;
+        trenes[i] = { horas, minutos, segundos };
     }
 
+    for (int i = 0; i < nHoras; i++) {
+        cin >> horas >> c >> minutos >> c >> segundos;
+        Hora actual = { horas, minutos, segundos };
+        auto lower = lower_bound(trenes.begin(), trenes.end(), actual);
+        
+        if (lower == trenes.end())
+            cout << "NO";
+        else
+            print(*lower);
+        
+        cout << "\n";
+    }
+    cout << "---\n";
     return true;
-} 
-
-void tratar_caso() {
-    int it;
-    float r, i;
-    cin >> r >> i >> it;
-
-    Complejo c(r, i);
-    cout << (esModulo(c, it) ? "SI" : "NO") << endl;
 }
 
 int main() {
@@ -61,10 +68,7 @@ int main() {
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
 
-    int numCasos;
-    cin >> numCasos;
-    while (numCasos--)
-        tratar_caso();
+    while (tratar_caso()) { }
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);
