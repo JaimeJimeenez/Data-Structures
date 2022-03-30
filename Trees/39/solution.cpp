@@ -24,6 +24,7 @@
 #include <utility>
 #include <tuple>
 #include <algorithm>
+#include <string>
 
 template <class T> class BinTree {
 public:
@@ -58,12 +59,6 @@ public:
   }
 
   void display(std::ostream &out) const { display_node(root_node, out); }
-  
-  int size() const { return size(this->root_node); }
-
-  int height() const { return height(this->root_node); }
-
-  int children() const { return children(this->root_node); }
 
 private:
   // Las definiciones de TreeNode y NodePointer dependen recursivamente
@@ -95,28 +90,6 @@ private:
       out << ")";
     }
   }
-
-  int size(const NodePointer &root) const {
-    if (root == nullptr)
-        return 0;
-    return 1 + size(root->left) + size(root->right);
-  }
-
-  int height(const NodePointer &root) const {
-    if (root == nullptr)
-        return 0;
-    
-    return 1 + std::max(height(root->right), height(root->left));
-  }
-
-  int children(const NodePointer &root) const {
-    if (root == nullptr)
-        return 0;
-    else if (root->right == nullptr && root->left == nullptr)
-        return 1;
-    else
-        return children(root->right) + children(root->left); 
-  }
 };
 
 template <typename T>
@@ -145,50 +118,35 @@ template <typename T> BinTree<T> read_tree(std::istream &in) {
 
 using namespace std;
 
-template<typename T>
-tuple<bool, T, T> binary_search_aux(const BinTree<T> & arbol) {
-  if (arbol.empty())
-    return { true, T(), T() };
-    
-  auto [abb_izq, min_izq, max_izq] = binary_search_aux(arbol.left());
-  auto [abb_der, min_der, max_der] = binary_search_aux(arbol.right());
+//@ <answer>
+//---------------------------------------------------------------
+// Modificar a partir de aquí
+// --------------------------------------------------------------
 
-  T menor = arbol.left().empty() ? arbol.root() : min_izq;
-  T mayor = arbol.right().empty() ? arbol.root() : max_der;
-  bool es_abb = abb_izq && abb_der && (arbol.left().empty() || max_izq < arbol.root()) && (arbol.right().empty() || arbol.root() < min_der);
 
-  return { es_abb, menor, mayor };
+// Función que trata un caso de prueba
+void tratar_caso() {
+  BinTree<char> t = read_tree<char>(cin);
+  
 }
 
-template<typename T>
-bool binary_search(const BinTree<T> &arbol) {
-    return get<0>(binary_search_aux(arbol));
-}
 
-bool tratar_caso() {
-  char c;
-  cin >> c;
-  if (!cin) return false;
+//---------------------------------------------------------------
+// No modificar por debajo de esta línea
+// --------------------------------------------------------------
+//@ </answer>
 
-  if (c == 'N') {
-    BinTree<int> t = read_tree<int>(cin);
-    cout << (binary_search(t) ? "SI" : "NO") << endl;
-  }
-  else {
-    BinTree<string> t = read_tree<string>(cin);
-    cout << (binary_search(t) ? "SI" : "NO") << endl;
-  }
-
-  return true;
-}
 
 int main() {
 #ifndef DOMJUDGE
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
+  int numCasos;
+  cin >> numCasos;
 
-  while (tratar_caso()) { }
+  while (numCasos--)
+    tratar_caso();
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);
@@ -197,3 +155,4 @@ int main() {
 #endif
   return 0;
 }
+

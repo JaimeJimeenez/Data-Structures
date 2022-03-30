@@ -25,6 +25,7 @@
 #include <tuple>
 #include <algorithm>
 #include <string>
+#include <math.h>
 
 template <class T> class BinTree {
 public:
@@ -123,36 +124,28 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-struct Rescate {
-    int grupo, excursionistas;
-    bool hayExc;
-};
+template<typename T>
+int num_nodos(const BinTree<T> &tree) {
+  if (tree.empty())
+    return 0;
+  return 1 + num_nodos(tree.left()) + num_nodos(tree.right());
+}
 
 template<typename T>
-Rescate rescate(const BinTree<T> &arbol) {
-  if (arbol.empty())
-    return { 0, 0, false };
+int altura(const BinTree<T> &tree) {
+  if (tree.empty())
+    return 0;
+  return 1 + max(altura(tree.left()), altura(tree.right()));
+}
 
-  Rescate izq = rescate(arbol.left());
-  Rescate der = rescate(arbol.right());
-
-  if (arbol.root() == 0) {
-    if (izq.hayExc || der.hayExc)
-      return {izq.grupo + der.grupo, max(izq.excursionistas, der.excursionistas), true};
-    else
-      return {0, 0, false};
-  }
-  if (der.hayExc || izq.hayExc) 
-    return {izq.grupo + der.grupo, max(izq.excursionistas + arbol.root(), der.excursionistas + arbol.root()), true};
-
-  return {1, max(izq.excursionistas + arbol.root(), der.excursionistas + arbol.root()), true};
+bool es_completo(const BinTree<char> &tree) {
+  return num_nodos(tree) == (pow(2, altura(tree)) - 1);
 }
 
 // Función que trata un caso de prueba
 void tratar_caso() {
-   BinTree<int> t = read_tree<int>(cin);
-   Rescate rescTotal = rescate(t);
-   cout << rescTotal.grupo << " " << rescTotal.excursionistas << endl;
+   BinTree<char> t = read_tree<char>(cin);
+   cout << (es_completo(t) ? "SI" : "NO" ) << endl;
 }
 
 
