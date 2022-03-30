@@ -261,31 +261,37 @@ std::ostream &operator<<(std::ostream &out, const ListLinkedDouble<T> &l) {
 
 using namespace std;
 
-void print(ListLinkedDouble<int> cola) {
-    while (!cola.empty()) {
-        cout << cola.front() << " ";
-        cola.pop_front();
+int alumno(int cantidad, int saltos) {
+    ListLinkedDouble<int> cola;
+
+    for (int i = 0; i < cantidad; i++)
+        cola.push_back(i + 1);
+
+    auto it = cola.begin();
+    while (cola.size() > 1) {
+        int i = 0;
+
+        while (i < saltos) {
+            int elegida = *it;
+            it = cola.erase(it);
+            cola.push_back(elegida);
+            i++;
+        }
+        
+        it = cola.erase(it);
     }
-    cout << endl;
+
+    return *it;
 }
 
 bool tratar_caso() {
-    int N;
-    cin >> N;
-    if (N == 0)
+    int N, M;
+    cin >> N >> M;
+    if (N == 0 && M == 0)
         return false;
 
-    ListLinkedDouble<int> cola;
-    int value;
-    while (N--) {
-        cin >> value;
-        if (value <= 0)
-            cola.push_front(value);
-        else
-            cola.push_back(value);
-    } 
+    cout << alumno(N, M) << endl;;
 
-    print(cola);
     return true;
 }
 

@@ -1,30 +1,13 @@
 #include <iostream>
-#include <fstream>
-#include <stack>
 
 using namespace std;
 
 bool tratar_caso() {
-    int value;
-    cin >> value;
-    if (value == -1) return false;
+    int R;
+    cin >> R;
+    if (!cin) return false;
 
-    stack<int> alturas;
-    while (value != -1) {
-        while (!alturas.empty() && alturas.top() <= value) 
-            alturas.pop();
-        
-        if (alturas.empty())
-            cout << "NO HAY\n";
-        else
-            cout << alturas.top() << "\n";
-            
-        alturas.push(value);
-        cin >> value;
-    }
-
-    cout << "---\n";
-    return true;
+    
 }
 
 int main() {
