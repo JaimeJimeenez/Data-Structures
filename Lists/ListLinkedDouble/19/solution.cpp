@@ -131,7 +131,7 @@ public:
   
   // Nuevo método
   // Se implementa más abajo
-  void zip(ListLinkedDouble& other);
+  void swap2by2();
   
 
 private:
@@ -225,58 +225,44 @@ void ListLinkedDouble::detach(Node *node) {
 
 // No olvides el coste!
 // Coste O(N) con respecto al número de elementos que tiene la lista
-void ListLinkedDouble::zip(ListLinkedDouble &other) {
-  if (empty()) {
-    head = other.head;
-    return;
-  }
-  if (other.empty())
-    return;
-  
-  Node* curr = head->next;
-  Node* curr_other = other.head->next;
+void ListLinkedDouble::swap2by2() {
+    if (num_elems == 1)
+        return;
 
-  while (curr != head && curr_other != other.head) {
-    Node* aux = curr_other->next;
-    other.detach(curr_other);
-    attach(curr_other, curr->next);
-    curr_other = aux;
-    curr = curr->next->next;
-  }
+    Node* curr = head->next;
 
-  if (curr_other != other.head && curr == head) {
-    while (curr_other != other.head) {
-      Node* aux = curr_other->next;
-      other.detach(curr_other);
-      attach(curr_other, head);
-      curr_other = aux;
+    while (curr != head->prev->prev && curr != head->prev) {
+        detach(curr);
+        attach(curr, curr->next->next);
+        curr = curr->next;
     }
-  }
+
+    if (num_elems % 2 == 0) {
+        detach(curr);
+        attach(curr, head);
+    }
+        
 }
 
 //}}}  
 
-void tratar_caso() {
-  
-  int N, value;
-  ListLinkedDouble list;
-  cin >> N;
-  
-  while (N--) {
-    cin >> value;
-    list.push_back(value);  
-  }
+bool tratar_caso() {
+    int N;
+    cin >> N;
+    if (N == 0)
+        return false;
+    
+    ListLinkedDouble list;
+    while (N--) {
+        int value;
+        cin >> value;
+        list.push_back(value);
+    }
 
-  ListLinkedDouble other;
-  cin >> N;
-  
-  while (N--) {
-    cin >> value;
-    other.push_back(value);
-  }
-
-  list.zip(other);
-  cout << list << endl;
+    list.swap2by2();
+    list.display();
+    cout << endl;
+    return true;
 }
 
 //---------------------------------------------------------------
@@ -291,10 +277,7 @@ int main() {
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
   
-  int numCasos;
-  cin >> numCasos;
-  for (int i = 0; i < numCasos; i++)
-    tratar_caso();
+  while(tratar_caso()) { }
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);

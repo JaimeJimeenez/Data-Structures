@@ -78,7 +78,7 @@ public:
         display(std::cout);
     }
 
-    void reverse();
+    void duplicate();
 
 private:
     Node* head;
@@ -185,22 +185,19 @@ void ListLinkedSingle::display(std::ostream& out) const {
     out << "]";
 }
 
-void ListLinkedSingle::reverse() {
+void ListLinkedSingle::duplicate() {
     if (empty())
         return;
     
-    Node* prev = nullptr;
-    Node* aux = nullptr;
     Node* curr = head;
+    Node* nextNode = nullptr;
 
     while (curr != nullptr) {
-        aux = curr->next;
-        curr->next = prev;
-        prev = curr;
-        curr = aux;
+        nextNode = curr->next;
+        curr->next = new Node {curr->value, nextNode};
+        curr = nextNode;
     }
 
-    head = prev;
 }
 
 
@@ -214,7 +211,7 @@ void tratar_caso() {
         cin >> value;
     }
     
-    list.reverse();
+    list.duplicate();
     list.display();
     cout << endl;
 }
@@ -235,7 +232,7 @@ int main() {
 #ifndef DOMJUDGE
     std::cin.rdbuf(cinbuf);
     // Descomentar si se trabaja en Windows
-    // system("PAUSE");
+    //system("PAUSE");
 #endif
     return 0;
 }
