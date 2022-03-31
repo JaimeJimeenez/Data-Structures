@@ -21,11 +21,12 @@ bool tratar_caso() {
     cin.ignore();
 
     int i = 1;
+    MapTree<string, vector<int>> diccionario;
     while (num_lineas--) {
         string linea;
         getline(cin, linea);
 
-        MapTree<string, vector<int>> diccionario;
+        
         string palabra;
         stringstream flujo(linea);
 
@@ -41,6 +42,14 @@ bool tratar_caso() {
         }
     }
 
+    for (const auto& it : diccionario) {
+        auto list = it.value;
+
+        cout << it.key << " ";
+        for (auto elem : list)
+            cout << elem << " ";
+        cout << endl;
+    }
     return true;
 }
 
