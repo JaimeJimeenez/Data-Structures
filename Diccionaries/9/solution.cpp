@@ -627,55 +627,24 @@ void resultado(const MapTree<string, int> &resultados) {
     cout << elem.key << " = " << elem.value << endl;
 }
 
-void rellenarPila(BinTree<string> arbol, stack<string> &pila) {
-  pila.push(arbol.root());
-
-  // Si se trata de nodos internos
-  if (esOperador(arbol.root())) { 
-    rellenarPila(arbol.left(), pila);
-    rellenarPila(arbol.right(), pila);
-  }
-
-}
-
 /* Tres casos posibles:
       1. Se trata de un operador
       2. Se trata de una variable
       3. Se trata de un número
 */
 int calcular(MapTree<string, int> &resultados, BinTree<string> const& arbol) {
-  stack<string> pila;
-  rellenarPila(arbol, pila);
-
-  stack<int> numeros;
-  while (!pila.empty()) {
-
-    if (esOperador(pila.top())) {
-      int resultado = numeros.top(); numeros.pop();
-      if (pila.top() == "+")
-        resultado += numeros.top();
-      else if (pila.top() == "-")
-        resultado -= numeros.top();
-      else
-        resultado *= numeros.top();
-      
-      numeros.pop();
-      pila.pop(); 
-      numeros.push(resultado); 
-    }
-    else {
-      if (esVariable(pila.top())) {
-        int numero = resultados.at(pila.top()); pila.pop();
-        numeros.push(numero);
-      }
-      else {
-        numeros.push(stoi(pila.top(), nullptr, 10));
-        pila.pop();
-      }
-    }
+  if (!esOperador(arbol.root())) {
+    if (esVariable(arbol.root())) 
+      return resultados.at(arbol.root());
+    return stoi(arbol.root(), nullptr, 10);
   }
 
-  return numeros.top();
+  int izq = calcular(resultados, arbol.left());
+  int der = calcular(resultados, arbol.right());
+  
+  if (arbol.root() == "+") return izq + der;
+  else if (arbol.root() == "-") return izq - der;
+  else return izq * der;
 }
 
 // Coste O(N * M) siendo N el número de variables y M la longitud de las expresiones de dichas variables (representadas por nodos del arbol)
