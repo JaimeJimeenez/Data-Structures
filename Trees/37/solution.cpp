@@ -123,11 +123,52 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
+bool esPrimo(int n) {
+  int i = 2;
+  
+  while (i < n) {
+    if (n % i == 0) return false;
+    i++;
+  }
+
+  return true;
+}
+
+bool esMultiplo(int n) {
+  return (n % 7 == 0 && n != 7);
+}
+
+/*
+  Primera componente: Elemento del nodo
+  Segunda componente: Profundidad en el arbol de la primera componente
+*/
+pair<int, int> barreraPrimos(const BinTree<int> &arbol) {
+  if (arbol.empty()) return { -1, 0 };
+  if (esMultiplo(arbol.root())) return { arbol.root(), 1 };
+  if (esPrimo(arbol.root())) return { -1, 0};
+
+  auto izq = barreraPrimos(arbol.left());
+  auto der = barreraPrimos(arbol.right());
+
+  if (izq.first == -1) return { der.first, der.second + 1 };
+  if (der.first == -1) return { izq.first, izq.second + 1 };
+  if (der.second < izq.second) return { der.first, der.second + 1 };
+  
+  return { izq.first, izq.second + 1 };
+}
+
 
 // Función que trata un caso de prueba
 void tratar_caso() {
-  BinTree<char> t = read_tree<char>(cin);
+  BinTree<int> t = read_tree<int>(cin);
+  auto primo = barreraPrimos(t);
   
+  if (primo.first == -1)
+    cout << "NO HAY";
+  else 
+    cout << primo.first << " " << primo.second;
+  cout << endl; 
+
 }
 
 
