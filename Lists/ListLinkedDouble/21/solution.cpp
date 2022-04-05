@@ -128,11 +128,10 @@ public:
 
   void display() const { display(std::cout); }
   
-  void display_reverse() const;
-
+  
   // Nuevo método
   // Se implementa más abajo
-  void partition(int pivot);
+  void zip(ListLinkedDouble& other);
   
 
 private:
@@ -198,19 +197,6 @@ void ListLinkedDouble::display(std::ostream &out) const {
   out << "]";
 }
 
-void ListLinkedDouble::display_reverse() const {
-    cout << "[";
-    if (head->prev != head) {
-        cout << head->prev->value;
-        Node* current = head->prev->prev;
-        while (current != head) {
-            cout << ", " << current->value;
-            current = current->prev;
-        }
-    }
-    cout << "]";
-}
-
 std::ostream &operator<<(std::ostream &out, const ListLinkedDouble &l) {
   l.display(out);
   return out;
@@ -237,47 +223,60 @@ void ListLinkedDouble::detach(Node *node) {
   node->prev->next = node->next;
 }
 
-void ListLinkedDouble::partition(int pivot) {
+// No olvides el coste!
+// Coste O(N) con respecto al número de elementos que tiene la lista
+void ListLinkedDouble::zip(ListLinkedDouble &other) {
+  if (empty()) {
+    head = other.head;
+    return;
+  }
+  if (other.empty())
+    return;
+  
   Node* curr = head->next;
-  Node* lastNode = head->prev;
-  int cont = 0;
-  Node* aux = nullptr;
+  Node* curr_other = other.head->next;
 
-  while (curr != lastNode) {
-    if (curr->value > pivot) {
-      aux = curr->next;
-      detach(curr);
-      attach(curr, head);
-      curr = aux;
-    }
-    else
-      curr = curr->next;
+  while (curr != head && curr_other != other.head) {
+    Node* aux = curr_other->next;
+    other.detach(curr_other);
+    attach(curr_other, curr->next);
+    curr_other = aux;
+    curr = curr->next->next;
   }
 
-  if (curr->value > pivot) {
-    detach(curr);
-    attach(curr, head);
+  if (curr_other != other.head && curr == head) {
+    while (curr_other != other.head) {
+      Node* aux = curr_other->next;
+      other.detach(curr_other);
+      attach(curr_other, head);
+      curr_other = aux;
+    }
   }
 }
 
 //}}}  
 
 void tratar_caso() {
-    ListLinkedDouble list;
-    int value;
+  
+  int N, value;
+  ListLinkedDouble list;
+  cin >> N;
+  
+  while (N--) {
     cin >> value;
+    list.push_back(value);  
+  }
 
-    while (value != 0) {
-        list.push_back(value);
-        cin >> value;
-    }
+  ListLinkedDouble other;
+  cin >> N;
+  
+  while (N--) {
+    cin >> value;
+    other.push_back(value);
+  }
 
-    int pivot;
-    cin >> pivot;
-    list.partition(pivot);
-    cout << list << endl;
-    list.display_reverse();
-    cout << endl;
+  list.zip(other);
+  cout << list << endl;
 }
 
 //---------------------------------------------------------------
@@ -292,9 +291,9 @@ int main() {
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
   
- int numCasos;
- cin >> numCasos;
- while (numCasos--)
+  int numCasos;
+  cin >> numCasos;
+  for (int i = 0; i < numCasos; i++)
     tratar_caso();
 
 #ifndef DOMJUDGE

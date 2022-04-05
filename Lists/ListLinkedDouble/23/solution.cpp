@@ -2,25 +2,27 @@
  * ---------------------------------------------------
  *                ESTRUCTURAS DE DATOS
  * ---------------------------------------------------
- *              Manuel Montenegro Montes
  *              Facultad de Informática
  *         Universidad Complutense de Madrid
  * ---------------------------------------------------
  */
-
+ 
 /*
- * Implementación del TAD Lista mediante listas doblemente enlazadas circulares.
+ * MUY IMPORTANTE: Para realizar este ejercicio solo podéis
+ * modificar el código contenido entre las etiquetas <answer>
+ * y </answer>. Toda modificación fuera de esas etiquetas está
+ * prohibida, pues no se tendrá en cuenta para la corrección.
  *
- * Versión con sobrecarga de operadores * y ++ en lugar de los métodos elem() y
- * advance()
+ * Tampoco esta permitido modificar las líneas que contienen
+ * las etiquetas <answer> y </answer>, obviamente :-)
  */
-
-#ifndef __LIST_LINKED_DOUBLE_H
-#define __LIST_LINKED_DOUBLE_H
 
 #include <cassert>
 #include <iostream>
 #include <fstream>
+
+#ifndef __LIST_LINKED_DOUBLE_H
+#define __LIST_LINKED_DOUBLE_H
 
 template <typename T> class ListLinkedDouble {
 private:
@@ -153,6 +155,23 @@ public:
     return result;
   }
 
+  template <typename Predicate>
+  void remove_if(Predicate pred) {
+      Node* curr = head->next;
+      while (curr != head) {
+          Node* sig = curr->next;
+          if (pred.notValid(curr->value.getEdad())) dettach(curr);
+          curr = sig; 
+      }
+  }
+
+  void dettach(Node* node) {
+      assert(node != nullptr);
+      node->prev->next = node->next;
+      node->next->prev = node->prev;
+      delete node;
+      num_elems--;
+  }
 
 private:
   Node *head;
@@ -261,48 +280,62 @@ std::ostream &operator<<(std::ostream &out, const ListLinkedDouble<T> &l) {
 
 using namespace std;
 
-int alumno(int cantidad, int saltos) {
-    ListLinkedDouble<int> cola;
+class Persona {
+private:
+    int edad;
+    string nombre;
+public:
+    Persona() : edad(0), nombre("") { }
+    Persona(int edad, string nombre) : edad(edad), nombre(nombre) { }
 
-    for (int i = 0; i < cantidad; i++)
-        cola.push_back(i + 1);
+    int getEdad() const { return edad; }
 
-    auto it = cola.begin();
-    while (cola.size() > 1) {
-        int i = 0;
-
-        while (i < saltos) {
-            int elegida = *it;
-            it = cola.erase(it);
-            cola.push_back(elegida);
-            i++;
-        }
-        
-        it = cola.erase(it);
+    void print() {
+        cout << nombre << endl;
     }
+};
 
-    return *it;
-}
+class Predicate {
+private:
+    int min, max;
+public:
+    Predicate(int min, int max) : min(min), max(max) { }
+
+    bool notValid(int elem) { return elem < min || elem > max; }
+};
 
 bool tratar_caso() {
-    int N, M;
-    cin >> N >> M;
-    if (N == 0 && M == 0)
-        return false;
+    int N, min, max;
+    cin >> N >> min >> max;
+    if (N == 0 && min == 0 && max == 0) return false;
 
-    cout << alumno(N, M) << endl;;
+    ListLinkedDouble<Persona> lista;
+    string nombre;
+    int edad;
+    while (N--) {
+        cin >> edad;
+        getline(cin, nombre);
+        lista.push_back({ edad, nombre });
+    }
 
+    Predicate pred(min, max);
+    lista.remove_if(pred);
+
+    while (!lista.empty()) {
+        lista.front().print();
+        lista.pop_front();
+    }
+    cout << "---\n";
     return true;
 }
-
 
 int main() {
 #ifndef DOMJUDGE
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-  
-  while (tratar_caso()) {  }
+
+  while (tratar_caso());
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);

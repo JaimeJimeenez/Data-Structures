@@ -24,7 +24,6 @@
 #include <utility>
 #include <tuple>
 #include <algorithm>
-#include <string>
 
 template <class T> class BinTree {
 public:
@@ -59,6 +58,12 @@ public:
   }
 
   void display(std::ostream &out) const { display_node(root_node, out); }
+  
+  int size() const { return size(this->root_node); }
+
+  int height() const { return height(this->root_node); }
+
+  int children() const { return children(this->root_node); }
 
 private:
   // Las definiciones de TreeNode y NodePointer dependen recursivamente
@@ -89,6 +94,28 @@ private:
       display_node(root->right, out);
       out << ")";
     }
+  }
+
+  int size(const NodePointer &root) const {
+    if (root == nullptr)
+        return 0;
+    return 1 + size(root->left) + size(root->right);
+  }
+
+  int height(const NodePointer &root) const {
+    if (root == nullptr)
+        return 0;
+    
+    return 1 + std::max(height(root->right), height(root->left));
+  }
+
+  int children(const NodePointer &root) const {
+    if (root == nullptr)
+        return 0;
+    else if (root->right == nullptr && root->left == nullptr)
+        return 1;
+    else
+        return children(root->right) + children(root->left); 
   }
 };
 
@@ -124,42 +151,10 @@ using namespace std;
 // --------------------------------------------------------------
 
 
-template<typename T>
-T minimo(const BinTree<T> &tree) {
-    if (tree.left().empty() && tree.right().empty())
-        return tree.root();
-
-    T elem = tree.root();
-
-    if (!tree.left().empty()) {
-        T minimIzq = minimo(tree.left());
-        elem = std::min(elem, minimIzq);
-    }
-
-    if (!tree.right().empty()) {
-        T minimDer = minimo(tree.right());
-        elem = std::min(elem, minimDer);
-    }
-    
-    return elem;
-}
-
 // Función que trata un caso de prueba
-bool tratar_caso() {
-    char c;
-    cin >> c;
-    if (!cin)
-        return false;
-    
-    if (c == 'N') {
-        BinTree<int> t = read_tree<int>(cin);
-        cout << minimo(t) << endl;
-    }
-    else {
-        BinTree<std::string> t= read_tree<std::string>(cin);
-        cout << minimo(t) << endl;
-    }
-    return true;
+void tratar_caso() {
+  BinTree<char> t = read_tree<char>(cin);
+  cout << t.size() << " " << t.children() << " " << t.height() << endl;
 }
 
 
@@ -174,8 +169,12 @@ int main() {
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
+  int num_casos;
+  cin >> num_casos;
   
-  while (tratar_caso());
+  for (int i = 0; i < num_casos; i++) {
+    tratar_caso();
+  }
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);

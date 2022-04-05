@@ -123,52 +123,35 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-bool esPrimo(int n) {
-  int i = 2;
-  
-  while (i < n) {
-    if (n % i == 0) return false;
-    i++;
-  }
-
-  return true;
+template<typename T>
+int num_nodos(const BinTree<T> &arbol) {
+    if (arbol.empty())
+        return 0;
+    return 1 + num_nodos(arbol.left()) + num_nodos(arbol.right());
 }
 
-bool esMultiplo(int n) {
-  return (n % 7 == 0 && n != 7);
+template<typename T>
+pair<bool, int> es_zurdo_aux(const BinTree<T>& arbol) {
+  if (arbol.empty())
+    return { true, 0 };
+  if (arbol.left().empty() && arbol.right().empty())
+    return { true, 1 };
+
+  auto [es_zurdo_izq, nodos_izq] = es_zurdo_aux(arbol.left());
+  auto [es_zurdo_der, nodos_der] = es_zurdo_aux(arbol.right());
+
+  return { es_zurdo_izq && es_zurdo_der && nodos_izq > nodos_der, 1 + nodos_izq + nodos_der };  
 }
 
-/*
-  Primera componente: Elemento del nodo
-  Segunda componente: Profundidad en el arbol de la primera componente
-*/
-pair<int, int> barreraPrimos(const BinTree<int> &arbol) {
-  if (arbol.empty()) return { -1, 0 };
-  if (esMultiplo(arbol.root())) return { arbol.root(), 1 };
-  if (esPrimo(arbol.root())) return { -1, 0};
-
-  auto izq = barreraPrimos(arbol.left());
-  auto der = barreraPrimos(arbol.right());
-
-  if (izq.first == -1) return { der.first, der.second + 1 };
-  if (der.first == -1) return { izq.first, izq.second + 1 };
-  if (der.second < izq.second) return { der.first, der.second + 1 };
-  
-  return { izq.first, izq.second + 1 };
+template<typename T>
+bool es_zurdo(const BinTree<T> t) {
+    return es_zurdo_aux(t).first;
 }
-
 
 // Función que trata un caso de prueba
 void tratar_caso() {
-  BinTree<int> t = read_tree<int>(cin);
-  auto primo = barreraPrimos(t);
-  
-  if (primo.first == -1)
-    cout << "NO HAY";
-  else 
-    cout << primo.first << " " << primo.second;
-  cout << endl; 
-
+   BinTree<char> t = read_tree<char>(cin);
+   cout << (es_zurdo(t) ? "SI" : "NO") << endl;
 }
 
 

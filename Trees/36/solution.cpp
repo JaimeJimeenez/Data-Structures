@@ -123,35 +123,36 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-template<typename T>
-int num_nodos(const BinTree<T> &arbol) {
-    if (arbol.empty())
-        return 0;
-    return 1 + num_nodos(arbol.left()) + num_nodos(arbol.right());
-}
+struct Rescate {
+    int grupo, excursionistas;
+    bool hayExc;
+};
 
 template<typename T>
-pair<bool, int> es_zurdo_aux(const BinTree<T>& arbol) {
+Rescate rescate(const BinTree<T> &arbol) {
   if (arbol.empty())
-    return { true, 0 };
-  if (arbol.left().empty() && arbol.right().empty())
-    return { true, 1 };
+    return { 0, 0, false };
 
-  auto [es_zurdo_izq, nodos_izq] = es_zurdo_aux(arbol.left());
-  auto [es_zurdo_der, nodos_der] = es_zurdo_aux(arbol.right());
+  Rescate izq = rescate(arbol.left());
+  Rescate der = rescate(arbol.right());
 
-  return { es_zurdo_izq && es_zurdo_der && nodos_izq > nodos_der, 1 + nodos_izq + nodos_der };  
-}
+  if (arbol.root() == 0) {
+    if (izq.hayExc || der.hayExc)
+      return {izq.grupo + der.grupo, max(izq.excursionistas, der.excursionistas), true};
+    else
+      return {0, 0, false};
+  }
+  if (der.hayExc || izq.hayExc) 
+    return {izq.grupo + der.grupo, max(izq.excursionistas + arbol.root(), der.excursionistas + arbol.root()), true};
 
-template<typename T>
-bool es_zurdo(const BinTree<T> t) {
-    return es_zurdo_aux(t).first;
+  return {1, max(izq.excursionistas + arbol.root(), der.excursionistas + arbol.root()), true};
 }
 
 // Función que trata un caso de prueba
 void tratar_caso() {
-   BinTree<char> t = read_tree<char>(cin);
-   cout << (es_zurdo(t) ? "SI" : "NO") << endl;
+   BinTree<int> t = read_tree<int>(cin);
+   Rescate rescTotal = rescate(t);
+   cout << rescTotal.grupo << " " << rescTotal.excursionistas << endl;
 }
 
 
