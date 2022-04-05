@@ -52,7 +52,6 @@ bool tratar_caso() {
   return true;
 }
 
-
 int main() {
 #ifndef DOMJUDGE
   std::ifstream in("sample.in");

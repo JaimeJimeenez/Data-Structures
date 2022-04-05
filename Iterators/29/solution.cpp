@@ -1,44 +1,44 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 
 using namespace std;
 
 bool tratar_caso() {
-    string line;
-    getline(cin, line);
+    string linea;
+    char comando;
+    getline(cin, linea);
     if (!cin) return false;
 
-    auto cursor = line.begin();
-    auto it = line.begin();
+    stringstream flujo(linea);
+    string secuencia;
 
-    for (int i = 0; i < line.size(); i++) {
-        if (line[i] == "-") {
-            cursor = line.begin();
-            it = line.erase(it);
-        }
-        else if (line[i] == "+") {
-            cursor = --line.end();
-            it = line.erase(it);
-        }
-        else if (line[i] == "*") {
+    auto it = linea.begin();
+    auto cursor = secuencia.begin();
+
+    while (flujo >> comando) {
+        if (comando == '+') 
+            cursor = secuencia.end();
+        else if (comando == '-') 
+            cursor = secuencia.begin();
+        else if (comando == '*')
             ++cursor;
-            it = line.erase(it);
+        else if (comando == '3') 
+            cursor = secuencia.erase(cursor);
+        else {
+            secuencia.insert(cursor, comando);
+            ++cursor;
         }
-        else if (line[i] == "3") {
-            cursor = line.erase(cursor);
-            it = line.erase(it);
-        }
-        ++it;
     }
-    cout << line <<  endl;
 
+    cout << secuencia << endl;
     return true;
 }
 
 int main() {
 #ifndef DOMJUDGE
-    std::ifstream in("sample1.in");
+    std::ifstream in("sample.in");
     auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
 

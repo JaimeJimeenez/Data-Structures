@@ -7,7 +7,10 @@
         "ostream": "cpp",
         "xlocale": "cpp",
         "deque": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "unordered_map": "cpp",
+        "map": "cpp",
+        "set": "cpp"
     },
     "C_Cpp.default.cppStandard": "c++17",
     "C_Cpp.default.cStandard": "c17"
