@@ -226,32 +226,31 @@ void ListLinkedDouble::detach(Node *node) {
 // No olvides el coste!
 // Coste O(N) con respecto al número de elementos que tiene la lista
 void ListLinkedDouble::zip(ListLinkedDouble &other) {
-  if (empty()) {
-    head = other.head;
-    return;
-  }
-  if (other.empty())
-    return;
-  
-  Node* curr = head->next;
+  Node* curr_this = head->next;
   Node* curr_other = other.head->next;
 
-  while (curr != head && curr_other != other.head) {
-    Node* aux = curr_other->next;
-    other.detach(curr_other);
-    attach(curr_other, curr->next);
-    curr_other = aux;
-    curr = curr->next->next;
+  while (curr_this != head && curr_other != other.head) {
+    Node* sig_this = curr_this->next;
+    Node* sig_other = curr_other->next;
+
+    detach(curr_other);
+    attach(curr_other, sig_this);
+    curr_this = sig_this;
+    curr_other = sig_other;
   }
 
-  if (curr_other != other.head && curr == head) {
-    while (curr_other != other.head) {
-      Node* aux = curr_other->next;
-      other.detach(curr_other);
-      attach(curr_other, head);
-      curr_other = aux;
-    }
+  if (curr_other != other.head) {
+    curr_other->prev = head->prev;
+    head->prev->next = curr_other;
+    other.head->prev->next = head;
+    head->prev = other.head->prev;
   }
+
+  num_elems += other.num_elems;
+
+  other.num_elems = 0;
+  other.head->next = other.head;
+  other.head->prev = other.head;
 }
 
 //}}}  
