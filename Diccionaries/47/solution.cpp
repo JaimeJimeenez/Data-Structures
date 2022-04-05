@@ -9,7 +9,7 @@
 using namespace std;
 
 void aMinusculas(string& palabra) {
-  for (char c : palabra)
+  for (char& c : palabra)
     c = tolower(c);
 }
 
@@ -22,12 +22,12 @@ bool tratar_caso() {
 
   MapTree<string, vector<int>> diccionario;
   int i = 1;
+  
   while (num_lineas--) {
     string linea, palabra;
     getline(cin, linea);
-
-    stringstream flujo(palabra);
-
+    
+    stringstream flujo(linea);
     while (flujo >> palabra) {
       aMinusculas(palabra);
 
@@ -45,10 +45,11 @@ bool tratar_caso() {
 
     cout << it.key << " ";
     for (auto elem : list)
-      cout <<< elem << " ";
+      cout << elem << " ";
     cout << endl;
   }
 
+  cout << "---\n";
   return true;
 }
 
