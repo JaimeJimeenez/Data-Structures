@@ -30,36 +30,26 @@
 
 using namespace std;
 
-void print(map<string, set<string>> juego) {
-  for (auto it : juego) {
-    auto jugadores = it.second;
-    cout << it.first << " ";
-    for (auto jugador : jugadores) {
-      cout << jugador << " ";
-    }
-    cout << endl;
-  }
-}
-
-void jugar(map<string, set<string>> &juego, map<string, int> &personas) {
+void jugar(map<string, set<string>> juego) {
   int T;
   cin >> T;
 
-  string nombre, casilla;
   while (T--) {
+    string nombre, casilla;
+    bool vencido = false, hundido = false;
     cin >> nombre >> casilla;
-    bool hundido = false, vencido = false;
-    auto jugadores = juego.at(casilla);
 
-    for (auto jugador : jugadores) {
-      if (jugador != nombre) {
-        personas[jugador]--;
-        if (personas[jugador] == 0) vencido = true;
-        else hundido = true;
-        juego.at(casilla).erase(jugador);
+    for (auto jugador : juego) {
+      if (jugador.first != nombre) {
+        auto& casillas = juego.at(jugador.first);
+        
+        if (casillas.count(casilla) == 1) {
+          casillas.erase(casilla);
+          if (casillas.size() == 0) vencido = true;
+          else hundido = true;
+        }
       }
     }
-    juego.insert({ casilla, jugadores });
 
     if (vencido) cout << "VENCIDO\n";
     else if (hundido) cout << "HUNDIDO\n";
@@ -67,28 +57,25 @@ void jugar(map<string, set<string>> &juego, map<string, int> &personas) {
   }
 }
 
-
-
 bool tratar_caso() {
-  int N, C, T;
+  int N, C;
   cin >> N >> C;
   if (N == 0 && C == 0) return false;
 
   map<string, set<string>> juego;
-  map<string, int> jugadores;
-  string nombre, casilla;
+
   while (N--) {
+    string nombre, casilla;
     cin >> nombre;
 
-    jugadores.insert( { nombre, C });
     for (int i = 0; i < C; i++) {
       cin >> casilla;
-      juego[casilla].insert( nombre );
+      juego[nombre].insert(casilla);
     }
-  }
-  //print(juego);
-  jugar(juego, jugadores);
 
+  }
+
+  jugar(juego);  
   cout << "---\n";
   return true;
 }

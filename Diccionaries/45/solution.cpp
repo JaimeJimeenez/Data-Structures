@@ -311,49 +311,66 @@ std::ostream &operator<<(std::ostream &out, const MapTree<K, V> &map) {
 
 using namespace std;
 
-void organizacion(MapTree<int, int> const& departamentos) {
-    for (auto elem : departamentos)
-        cout << elem.key << " " << elem.value << endl;
+void organizacion(MapTree<int, int> const& departamentos, int max) {
+  for (auto elem : departamentos) {
+    cout << elem.key << " ";
+    if (elem.value == max + 1) cout << "JEFE";
+    else cout << elem.value;
+    cout << endl;
+  }
 }
 
-void reorganizarEmpleados(MapTree<int, int> &empleados, int value, int C) {
-    bool organizado = false;
-    while (!organizado) {
-        if (!empleados.contains(value)) organizado = true;
-        else if (empleados.at(value) < C) organizado = true;
-        else value++;
-    }
-    if (empleados.contains(value)) empleados[value]++;
-    else empleados.insert( { value, 1 } );
+int despachoDirectivo(const MapTree<int, int> &despachos, int ultimo) {
+  while (despachos.contains(ultimo))
+    ultimo++; 
+  return ultimo;
+}
+
+int despachoVacio(const MapTree<int, int>& despachos, int ultimo, int max) {
+  while (despachos.contains(ultimo) && despachos.at(ultimo) >= max)
+    ultimo++;
+  return ultimo;
+}
+
+MapTree<int, int> despachos(int max, stack<int> empleados, stack<int> directivos) {
+  MapTree<int, int> result;
+
+  while (!directivos.empty()) {
+    if (!result.contains(directivos.top())) result.insert( { directivos.top(), max + 1 } );
+    else result.insert( { despachoDirectivo(result, directivos.top()), max + 1} );
+    directivos.pop();
+  }
+
+  while (!empleados.empty()) {
+    if (!result.contains(empleados.top())) result.insert( { empleados.top(), 1 } );
+    else result[despachoVacio(result, empleados.top(), max)]++;
+    empleados.pop();
+  }
+
+  return result;
 }
 
 bool tratar_caso() {
-    int C, N, M;
-    cin >> C >> N >> M;
-    if (C == 0 && N == 0 && M == 0) return false;
+  int C, N, M;
+  cin >> C >> N >> M;
+  if (C == 0 && N == 0 && M == 0) return false;
 
-    MapTree <int, int> empleados;
-    int value;
-    while (N--) {
-        cin >> value;
-        reorganizarEmpleados(empleados, value, C);
-    }
-    cout << empleados << endl;
-    
-    MapTree<int, string> directivos;
-    while (M--) {
-        cin >> value;
-        if (empleados.contains(value)) {
-            reorganizarEmpleados(empleados, value, C);
-            empleados.erase(value);
-        }
-        directivos.insert( { value, "JEFE" } );
-    }
-    cout << directivos << endl;
+  stack<int> directivos, empleados;
+  int valor;
+  while (N--) {
+    cin >> valor;
+    empleados.push(valor);
+  }
 
-    organizacion(empleados);
-    cout << "---\n";
-    return true;
+  while (M--) {
+    cin >> valor;
+    directivos.push(valor);
+  }
+
+  MapTree<int, int> result = despachos(C, empleados, directivos);
+  organizacion(result, C);
+  cout << "---\n";
+  return true;
 }
 
 int main() {
