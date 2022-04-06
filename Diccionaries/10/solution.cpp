@@ -7,93 +7,128 @@
  * ---------------------------------------------------
  */
 
-/*
-  Utiliza las librerías de la STL en esta práctica.
-  
-  No te olvides del coste.
-*/
- 
-/*
-  Introduce aquí los nombres de los componentes del grupo:
-  
-  Componente 1: Jaime Jiménez Nieto
-  Componente 2: Ivan Pisonero Diaz
-*/
+ /*
+   Utiliza las librerías de la STL en esta práctica.
 
-// Añade los include que necesites
+   No te olvides del coste.
+ */
+
+ /*
+   Introduce aquí los nombres de los componentes del grupo:
+
+   Componente 1: Jaime Jiménez Nieto
+   Componente 2: Iván Pisonero Díaz
+ */
+
+
+
+ // Añade los include que necesites
 #include <iostream>
 #include <cassert>
 #include <fstream>
 #include <string>
-#include <map>
 #include <set>
+#include <unordered_map>
+
 
 using namespace std;
 
-void jugar(map<string, set<string>> juego) {
-  int T;
-  cin >> T;
+// Función para tratar un caso de prueba
+// Devuelve true si se ha procesado el caso de prueba
+// o false si no se ha procesado porque se ha encontrado la
+// marca de fin de entrada
 
-  while (T--) {
-    string nombre, casilla;
-    bool vencido = false, hundido = false;
-    cin >> nombre >> casilla;
-
-    for (auto jugador : juego) {
-      if (jugador.first != nombre) {
-        auto& casillas = juego.at(jugador.first);
-        
-        if (casillas.count(casilla) == 1) {
-          casillas.erase(casilla);
-          if (casillas.size() == 0) vencido = true;
-          else hundido = true;
-        }
-      }
-    }
-
-    if (vencido) cout << "VENCIDO\n";
-    else if (hundido) cout << "HUNDIDO\n";
-    else cout << "AGUA\n";
-  }
-}
-
+//Coste lineal con respecto a max(N, C*T)
 bool tratar_caso() {
-  int N, C;
-  cin >> N >> C;
-  if (N == 0 && C == 0) return false;
+    int N, C, T;
 
-  map<string, set<string>> juego;
+    cin >> N;
+    cin >> C;
 
-  while (N--) {
-    string nombre, casilla;
-    cin >> nombre;
-
-    for (int i = 0; i < C; i++) {
-      cin >> casilla;
-      juego[nombre].insert(casilla);
+    if (N == 0 && C == 0) {
+        return false;
     }
 
-  }
+    unordered_map<string, int> estado;
 
-  jugar(juego);  
-  cout << "---\n";
-  return true;
+    string jugador, buque, atacante, posAtacada;
+    unordered_map<string, set<string>> tablero;  //Primera componente es posición, segunda es conjunto de jugadores en esa posición
+
+    while (N--) {
+        cin >> jugador;
+        estado.insert({ jugador, C });
+
+        for (int i = 0; i < C; i++) {
+            cin >> buque;
+
+            if (tablero.count(buque) == 0) {
+                set<string> jugadores;
+                jugadores.insert(jugador);
+                tablero.insert({ buque, jugadores });
+            }
+            else {
+                tablero.at(buque).insert(jugador);
+            }
+        }
+    }
+
+    bool hundido, vencido;
+
+    cin >> T;
+    while (T--) {
+        set<string> atacados;
+        hundido = false;
+        vencido = false;
+
+        cin >> atacante;
+        cin >> posAtacada;
+
+        if (tablero.count(posAtacada) != 0) {
+            auto it = tablero.at(posAtacada).begin();
+
+            while (it != tablero.at(posAtacada).end()) {
+                if (*it != atacante) {
+                    estado.at(*it)--;
+                    if (estado.at(*it) == 0) {
+                        vencido = true;
+                        estado.erase(*it);
+                    }
+                    it = tablero.at(posAtacada).erase(it);
+                    hundido = true;
+                }
+                else {
+                    ++it;
+                }
+            }
+        }
+
+        if (vencido) {
+            cout << "VENCIDO" << endl;
+        }
+        else if (hundido) {
+            cout << "HUNDIDO" << endl;
+        }
+        else {
+            cout << "AGUA" << endl;
+        }
+    }
+    cout << "---" << endl;
+    return true;
 }
 
 
 int main() {
 #ifndef DOMJUDGE
-  std::ifstream in("sample.in");
-  auto cinbuf = std::cin.rdbuf(in.rdbuf());
+    std::ifstream in("sample.in");
+    auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
 
-  while (tratar_caso()) { }
+    while (tratar_caso()) {}
 
 #ifndef DOMJUDGE
-  std::cin.rdbuf(cinbuf);
-  // Descomentar si se trabaja en Windows
-  // system("PAUSE");
+    std::cin.rdbuf(cinbuf);
+    // Descomentar si se trabaja en Windows
+    // system("PAUSE");
 #endif
-  return 0;
+    return 0;
 }
-
