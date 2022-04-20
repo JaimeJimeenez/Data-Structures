@@ -1,0 +1,23 @@
+anyadir_torre Tewell 2 0
+anyadir_torre Itarora 2 3
+anyadir_torre Drielshire 2 5
+torre_en_posicion 2 0
+torre_en_posicion 1 5
+anyadir_torre Olkbert 4 3
+anyadir_torre Sard 8 0
+posicion Olkbert
+torre_mas_cercana Itarora Sur
+torre_mas_cercana Itarora Oeste
+torre_mas_cercana Tewell Norte
+eliminar_torre Itarora
+torre_mas_cercana Tewell Norte
+FIN
+anyadir_torre Qiver 0 0
+anyadir_torre Yhin 0 0
+anyadir_torre Yhin 0 1
+anyadir_torre Qiver 1 3
+eliminar_torre Yhin
+posicion Inewood
+posicion Yhin
+torre_mas_cercana Qiver Norte
+FIN

@@ -1,0 +1,23 @@
+nueva_publicacion 3 Primera publicacion
+#pruebas #primeras_veces
+nueva_publicacion 1 Ahora va otra
+#pruebas #segundas_veces
+nueva_publicacion 5 Y una tercera
+#pruebas #me_canso
+mas_recientes 10
+hashtags 3
+anyadir_hashtag 1 #mas
+hashtags 1
+popularidad #pruebas
+borrar_publicacion 1
+popularidad #pruebas
+popularidad #segundas_veces
+FIN
+nueva_publicacion 3 Hola, mundo
+
+nueva_publicacion 3 Duplicada
+
+borrar_publicacion 1
+hashtags 1
+anyadir_hashtag 1 #vale
+FIN
