@@ -17,22 +17,19 @@
  * las etiquetas <answer> y </answer>, obviamente :-)
  */
 
-#include <cassert>
 #include <iostream>
+#include <cassert>
 #include <fstream>
 
-#ifndef __LIST_LINKED_DOUBLE_H
-#define __LIST_LINKED_DOUBLE_H
+using namespace std;
 
-template <typename T> class ListLinkedDouble {
+class ListLinkedDouble {
 private:
   struct Node {
-    T value;
+    int value;
     Node *next;
     Node *prev;
   };
-
-  template <typename U> class gen_iterator;
 
 public:
   ListLinkedDouble() : num_elems(0) {
@@ -48,11 +45,28 @@ public:
 
   ~ListLinkedDouble() { delete_nodes(); }
 
-  void push_front(const T &elem) { insert(cbegin(), elem); }
+  void push_front(const int &elem) {
+    Node *new_node = new Node{elem, head->next, head};
+    head->next->prev = new_node;
+    head->next = new_node;
+    num_elems++;
+  }
 
-  void push_back(const T &elem) { insert(cend(), elem); }
+  void push_back(const int &elem) {
+    Node *new_node = new Node{elem, head, head->prev};
+    head->prev->next = new_node;
+    head->prev = new_node;
+    num_elems++;
+  }
 
-  void pop_front() { erase(cbegin()); }
+  void pop_front() {
+    assert(num_elems > 0);
+    Node *target = head->next;
+    head->next = target->next;
+    target->next->prev = head;
+    delete target;
+    num_elems--;
+  }
 
   void pop_back() {
     assert(num_elems > 0);
@@ -67,33 +81,33 @@ public:
 
   bool empty() const { return num_elems == 0; };
 
-  const T &front() const {
+  const int &front() const {
     assert(num_elems > 0);
     return head->next->value;
   }
 
-  T &front() {
+  int &front() {
     assert(num_elems > 0);
     return head->next->value;
   }
 
-  const T &back() const {
+  const int &back() const {
     assert(num_elems > 0);
     return head->prev->value;
   }
 
-  T &back() {
+  int &back() {
     assert(num_elems > 0);
     return head->prev->value;
   }
 
-  const T &operator[](int index) const {
+  const int &operator[](int index) const {
     assert(0 <= index && index < num_elems);
     Node *result_node = nth_node(index);
     return result_node->value;
   }
 
-  T &operator[](int index) {
+  int &operator[](int index) {
     assert(0 <= index && index < num_elems);
     Node *result_node = nth_node(index);
     return result_node->value;
@@ -113,113 +127,28 @@ public:
   void display(std::ostream &out) const;
 
   void display() const { display(std::cout); }
-
-  using iterator = gen_iterator<T>;
-  using const_iterator = gen_iterator<const T>;
-
-  iterator begin() { return iterator(head, head->next); }
-
-  iterator end() { return iterator(head, head); }
-
-  const_iterator begin() const { return const_iterator(head, head->next); }
-
-  const_iterator end() const { return const_iterator(head, head); }
-
-  const_iterator cbegin() const { return const_iterator(head, head->next); }
-
-  const_iterator cend() const { return const_iterator(head, head); }
-
-  template <typename U>
-  gen_iterator<U> insert(gen_iterator<U> it, const T &elem) {
-    // Comprobamos que el iterador pertenece a la misma
-    // lista en la que realizamos la inserción.
-    assert(it.head == head);
-    Node *new_node = new Node{elem, it.current, it.current->prev};
-    it.current->prev->next = new_node;
-    it.current->prev = new_node;
-    num_elems++;
-    return gen_iterator<U>(head, new_node);
-  }
-
-  template <typename U> gen_iterator<U> erase(gen_iterator<U> it) {
-    // Comprobamos que el iterador pertenece a la misma
-    // lista en la que realizamos la inserción, y que no
-    // estamos en el último elemento.
-    assert(it.head == head && it.current != head);
-    Node *target = it.current;
-    it.current->prev->next = it.current->next;
-    it.current->next->prev = it.current->prev;
-    gen_iterator<U> result(head, it.current->next);
-    delete target;
-    num_elems--;
-    return result;
-  }
-
-  template <typename Predicate>
-  void remove_if(Predicate pred) {
-      Node* curr = head->next;
-      while (curr != head) {
-          Node* sig = curr->next;
-          if (pred.notValid(curr->value.getEdad())) dettach(curr);
-          curr = sig; 
-      }
-  }
-
-  void dettach(Node* node) {
-      assert(node != nullptr);
-      node->prev->next = node->next;
-      node->next->prev = node->prev;
-      delete node;
-      num_elems--;
-  }
+  
+  
+  // Nuevo método
+  // Se implementa más abajo
+  void zip(ListLinkedDouble& other);
+  
 
 private:
   Node *head;
   int num_elems;
 
-  template <typename U> class gen_iterator {
-  public:
-    gen_iterator &operator++() {
-      assert(current != head);
-      current = current->next;
-      return *this;
-    }
-
-    gen_iterator operator++(int) {
-      assert(current != head);
-      gen_iterator antes = *this;
-      current = current->next;
-      return antes;
-    }
-
-    U &operator*() const {
-      assert(current != head);
-      return current->value;
-    }
-
-    bool operator==(const gen_iterator &other) const {
-      return (head == other.head) && (current == other.current);
-    }
-
-    bool operator!=(const gen_iterator &other) const {
-      return !(*this == other);
-    }
-
-    friend class ListLinkedDouble;
-
-  private:
-    gen_iterator(Node *head, Node *current) : head(head), current(current) {}
-    Node *head;
-    Node *current;
-  };
-
   Node *nth_node(int n) const;
   void delete_nodes();
   void copy_nodes_from(const ListLinkedDouble &other);
+  
+  // Nuevos métodos
+  // Se implementan más abajo
+  static void attach(Node *node, Node *before);  
+  static void detach(Node *node);
 };
 
-template <typename T>
-typename ListLinkedDouble<T>::Node *ListLinkedDouble<T>::nth_node(int n) const {
+ListLinkedDouble::Node *ListLinkedDouble::nth_node(int n) const {
   int current_index = 0;
   Node *current = head->next;
 
@@ -231,7 +160,7 @@ typename ListLinkedDouble<T>::Node *ListLinkedDouble<T>::nth_node(int n) const {
   return current;
 }
 
-template <typename T> void ListLinkedDouble<T>::delete_nodes() {
+void ListLinkedDouble::delete_nodes() {
   Node *current = head->next;
   while (current != head) {
     Node *target = current;
@@ -242,8 +171,7 @@ template <typename T> void ListLinkedDouble<T>::delete_nodes() {
   delete head;
 }
 
-template <typename T>
-void ListLinkedDouble<T>::copy_nodes_from(const ListLinkedDouble &other) {
+void ListLinkedDouble::copy_nodes_from(const ListLinkedDouble &other) {
   Node *current_other = other.head->next;
   Node *last = head;
 
@@ -256,8 +184,7 @@ void ListLinkedDouble<T>::copy_nodes_from(const ListLinkedDouble &other) {
   head->prev = last;
 }
 
-template <typename T>
-void ListLinkedDouble<T>::display(std::ostream &out) const {
+void ListLinkedDouble::display(std::ostream &out) const {
   out << "[";
   if (head->next != head) {
     out << head->next->value;
@@ -270,72 +197,103 @@ void ListLinkedDouble<T>::display(std::ostream &out) const {
   out << "]";
 }
 
-template <typename T>
-std::ostream &operator<<(std::ostream &out, const ListLinkedDouble<T> &l) {
+std::ostream &operator<<(std::ostream &out, const ListLinkedDouble &l) {
   l.display(out);
   return out;
 }
 
-#endif
+//@ <answer>
+//---------------------------------------------------------------
+// Modificar a partir de aquí
+// --------------------------------------------------------------
 
-using namespace std;
-
-class Persona {
-private:
-    int edad;
-    string nombre;
-public:
-    Persona() : edad(0), nombre("") { }
-    Persona(int edad, string nombre) : edad(edad), nombre(nombre) { }
-
-    int getEdad() const { return edad; }
-
-    void print() {
-        cout << nombre << endl;
-    }
-};
-
-class Predicate {
-private:
-    int min, max;
-public:
-    Predicate(int min, int max) : min(min), max(max) { }
-
-    bool notValid(int elem) { return elem < min || elem > max; }
-};
-
-bool tratar_caso() {
-    int N, min, max;
-    cin >> N >> min >> max;
-    if (N == 0 && min == 0 && max == 0) return false;
-
-    ListLinkedDouble<Persona> lista;
-    string nombre;
-    int edad;
-    while (N--) {
-        cin >> edad;
-        getline(cin, nombre);
-        lista.push_back({ edad, nombre });
-    }
-
-    Predicate pred(min, max);
-    lista.remove_if(pred);
-
-    while (!lista.empty()) {
-        lista.front().print();
-        lista.pop_front();
-    }
-    cout << "---\n";
-    return true;
+// No olvides el coste!
+// Coste constante
+void ListLinkedDouble::attach(Node *node, Node *before) {
+  node->next = before;
+  node->prev = before->prev;
+  before->prev->next = node;
+  before->prev = node;
 }
+
+// No olvides el coste!
+// Coste constante
+void ListLinkedDouble::detach(Node *node) {
+  node->next->prev = node->prev;
+  node->prev->next = node->next;
+}
+
+// No olvides el coste!
+// Coste O(N) con respecto al número de elementos que tiene la lista
+void ListLinkedDouble::zip(ListLinkedDouble &other) {
+  Node* curr_this = head->next;
+  Node* curr_other = other.head->next;
+
+  while (curr_this != head && curr_other != other.head) {
+    Node* sig_this = curr_this->next;
+    Node* sig_other = curr_other->next;
+
+    detach(curr_other);
+    attach(curr_other, sig_this);
+    curr_this = sig_this;
+    curr_other = sig_other;
+  }
+
+  if (curr_other != other.head) {
+    curr_other->prev = head->prev;
+    head->prev->next = curr_other;
+    other.head->prev->next = head;
+    head->prev = other.head->prev;
+  }
+
+  num_elems += other.num_elems;
+
+  other.num_elems = 0;
+  other.head->next = other.head;
+  other.head->prev = other.head;
+}
+
+//}}}  
+
+void tratar_caso() {
+  
+  int N, value;
+  ListLinkedDouble list;
+  cin >> N;
+  
+  while (N--) {
+    cin >> value;
+    list.push_back(value);  
+  }
+
+  ListLinkedDouble other;
+  cin >> N;
+  
+  while (N--) {
+    cin >> value;
+    other.push_back(value);
+  }
+
+  list.zip(other);
+  cout << list << endl;
+}
+
+//---------------------------------------------------------------
+// No modificar por debajo de esta línea
+// --------------------------------------------------------------
+//@ </answer>
+
 
 int main() {
 #ifndef DOMJUDGE
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-
-  while (tratar_caso());
+  
+  int numCasos;
+  cin >> numCasos;
+  for (int i = 0; i < numCasos; i++)
+    tratar_caso();
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);

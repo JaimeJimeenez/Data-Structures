@@ -128,11 +128,10 @@ public:
 
   void display() const { display(std::cout); }
   
-  void display_reverse() const;
-
+  
   // Nuevo método
   // Se implementa más abajo
-  void partition(int pivot);
+  void swap2by2();
   
 
 private:
@@ -198,19 +197,6 @@ void ListLinkedDouble::display(std::ostream &out) const {
   out << "]";
 }
 
-void ListLinkedDouble::display_reverse() const {
-    cout << "[";
-    if (head->prev != head) {
-        cout << head->prev->value;
-        Node* current = head->prev->prev;
-        while (current != head) {
-            cout << ", " << current->value;
-            current = current->prev;
-        }
-    }
-    cout << "]";
-}
-
 std::ostream &operator<<(std::ostream &out, const ListLinkedDouble &l) {
   l.display(out);
   return out;
@@ -237,47 +223,46 @@ void ListLinkedDouble::detach(Node *node) {
   node->prev->next = node->next;
 }
 
-void ListLinkedDouble::partition(int pivot) {
-  Node* curr = head->next;
-  Node* lastNode = head->prev;
-  int cont = 0;
-  Node* aux = nullptr;
+// No olvides el coste!
+// Coste O(N) con respecto al número de elementos que tiene la lista
+void ListLinkedDouble::swap2by2() {
+    if (num_elems == 1)
+        return;
 
-  while (curr != lastNode) {
-    if (curr->value > pivot) {
-      aux = curr->next;
-      detach(curr);
-      attach(curr, head);
-      curr = aux;
+    Node* curr = head->next;
+
+    while (curr != head->prev->prev && curr != head->prev) {
+        detach(curr);
+        attach(curr, curr->next->next);
+        curr = curr->next;
     }
-    else
-      curr = curr->next;
-  }
 
-  if (curr->value > pivot) {
-    detach(curr);
-    attach(curr, head);
-  }
+    if (num_elems % 2 == 0) {
+        detach(curr);
+        attach(curr, head);
+    }
+        
 }
 
 //}}}  
 
-void tratar_caso() {
+bool tratar_caso() {
+    int N;
+    cin >> N;
+    if (N == 0)
+        return false;
+    
     ListLinkedDouble list;
-    int value;
-    cin >> value;
-
-    while (value != 0) {
-        list.push_back(value);
+    while (N--) {
+        int value;
         cin >> value;
+        list.push_back(value);
     }
 
-    int pivot;
-    cin >> pivot;
-    list.partition(pivot);
-    cout << list << endl;
-    list.display_reverse();
+    list.swap2by2();
+    list.display();
     cout << endl;
+    return true;
 }
 
 //---------------------------------------------------------------
@@ -292,10 +277,7 @@ int main() {
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
   
- int numCasos;
- cin >> numCasos;
- while (numCasos--)
-    tratar_caso();
+  while(tratar_caso()) { }
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);

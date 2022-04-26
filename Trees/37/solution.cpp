@@ -25,6 +25,7 @@
 #include <tuple>
 #include <algorithm>
 #include <string>
+#include <math.h>
 
 template <class T> class BinTree {
 public:
@@ -124,34 +125,27 @@ using namespace std;
 // --------------------------------------------------------------
 
 template<typename T>
-int num_nodos(const BinTree<T> &arbol) {
-    if (arbol.empty())
-        return 0;
-    return 1 + num_nodos(arbol.left()) + num_nodos(arbol.right());
+int num_nodos(const BinTree<T> &tree) {
+  if (tree.empty())
+    return 0;
+  return 1 + num_nodos(tree.left()) + num_nodos(tree.right());
 }
 
 template<typename T>
-pair<bool, int> es_zurdo_aux(const BinTree<T>& arbol) {
-  if (arbol.empty())
-    return { true, 0 };
-  if (arbol.left().empty() && arbol.right().empty())
-    return { true, 1 };
-
-  auto [es_zurdo_izq, nodos_izq] = es_zurdo_aux(arbol.left());
-  auto [es_zurdo_der, nodos_der] = es_zurdo_aux(arbol.right());
-
-  return { es_zurdo_izq && es_zurdo_der && nodos_izq > nodos_der, 1 + nodos_izq + nodos_der };  
+int altura(const BinTree<T> &tree) {
+  if (tree.empty())
+    return 0;
+  return 1 + max(altura(tree.left()), altura(tree.right()));
 }
 
-template<typename T>
-bool es_zurdo(const BinTree<T> t) {
-    return es_zurdo_aux(t).first;
+bool es_completo(const BinTree<char> &tree) {
+  return num_nodos(tree) == (pow(2, altura(tree)) - 1);
 }
 
 // Función que trata un caso de prueba
 void tratar_caso() {
    BinTree<char> t = read_tree<char>(cin);
-   cout << (es_zurdo(t) ? "SI" : "NO") << endl;
+   cout << (es_completo(t) ? "SI" : "NO" ) << endl;
 }
 
 

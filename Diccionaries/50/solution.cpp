@@ -1,44 +1,33 @@
 #include <iostream>
 #include <fstream>
-#include <map>
-#include <set>
-#include <algorithm>
+#include <string>
+
+#include "MapTree.h"
 
 using namespace std;
 
-void maximumCapitulos(const map<int, int>& series) {
-    for (auto const& it : series)
-        cout << it.second << endl;
-}
-
 bool tratar_caso() {
-    int N, M;
+    int N;
     cin >> N;
-    if (!cin) return false;
+    if (N == 0) return false;
 
-    map<int, int> series;
-    for (int i = 0; i < N; i++) {
-        cin >> M;
+    cin.ignore();
+
+    MapTree<string, int> alumnos;
+    string nombre, calificacion;
+
+    while (N--) {
+        getline(cin, nombre);
+        getline(cin, calificacion);
         
-        series[i] = 0;
-
-        set<int> capitulos;
-        int capitulo;
-        int maximum = 0;
-        while (M--) {
-            cin >> capitulo;
-            maximum++;
-            if (capitulos.count(capitulo) == 0) {
-                capitulos.insert(capitulo);
-                
-            }
-            else {
-                series.at(i) = max(series[i], maximum);
-                maximum = 0;
-            }
-        }
+        alumnos[nombre] += calificacion == "CORRECTO" ? 1 : -1;
     }
-    maximumCapitulos(series);
+
+    for (auto const &it : alumnos) {
+        if (it.value != 0) 
+            cout << it.key << ", " << it.value << endl;
+    }
+    cout << "---\n";
     return true;
 }
 
@@ -47,8 +36,8 @@ int main() {
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-
-    while (tratar_caso());
+  
+  while (tratar_caso()) {  }
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);

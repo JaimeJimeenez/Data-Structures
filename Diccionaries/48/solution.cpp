@@ -1,34 +1,27 @@
 #include <iostream>
 #include <fstream>
-#include <string>
 
-#include "MapTree.h"
+#include "BinTree.h"
 
 using namespace std;
 
+template<typename T>
+bool binary_search_aux(const BinTree<T>& arbol) {
+  auto it_ant = arbol.begin();
+  if (arbol.empty()) return true;
+  auto it_sig = ++arbol.begin();
+
+  while (it_sig != arbol.end() && *it_sig > *it_ant) {
+    it_ant++;
+    it_sig++;
+  }
+
+  return it_sig == arbol.end();
+}
+
 bool tratar_caso() {
-    int N;
-    cin >> N;
-    if (N == 0) return false;
-
-    cin.ignore();
-
-    MapTree<string, int> alumnos;
-    string nombre, calificacion;
-
-    while (N--) {
-        getline(cin, nombre);
-        getline(cin, calificacion);
-        
-        alumnos[nombre] += calificacion == "CORRECTO" ? 1 : -1;
-    }
-
-    for (auto const &it : alumnos) {
-        if (it.value != 0) 
-            cout << it.key << ", " << it.value << endl;
-    }
-    cout << "---\n";
-    return true;
+  BinTree<int> t = read_tree<int>(cin);
+  return binary_search_aux(t);
 }
 
 int main() {

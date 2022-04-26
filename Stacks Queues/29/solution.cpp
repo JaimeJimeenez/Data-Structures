@@ -1,29 +1,71 @@
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <stack>
+#include <queue>
+#include <string>
 
 using namespace std;
 
-bool tratar_caso() {
-    int value;
-    cin >> value;
-    if (value == -1) return false;
+bool esVocal(char c) {
+    return (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U');
+}
 
-    stack<int> alturas;
-    while (value != -1) {
-        while (!alturas.empty() && alturas.top() <= value) 
-            alturas.pop();
-        
-        if (alturas.empty())
-            cout << "NO HAY\n";
+void volcar(string& decodificado, stack<char>& pila) {
+    while (!pila.empty()) {
+        char c = pila.top(); 
+        pila.pop();
+        decodificado += c;
+    }
+}
+
+string decodificacion(const string& mensaje) {
+    stack<char> pila;
+    queue<char> cola;
+    string decodificado;
+    bool primero = true;
+
+    for (auto &c : mensaje) {
+        if (primero)
+            pila.push(c);
         else
-            cout << alturas.top() << "\n";
-            
-        alturas.push(value);
-        cin >> value;
+            cola.push(c);
+        primero = !primero;
     }
 
-    cout << "---\n";
+    while (!pila.empty()) {
+        cola.push(pila.top());
+        pila.pop();
+    }
+
+    while (!cola.empty()) {
+        char c = cola.front();
+        cola.pop();
+        if (!esVocal(c))
+            pila.push(c);
+        else {
+            volcar(decodificado, pila);
+            decodificado += c;
+        }
+    }
+    volcar(decodificado, pila);
+
+    string aux;
+    for (int i = decodificado.size() - 1; i >= 0; i--)  
+        aux.push_back(decodificado[i]);
+    decodificado = aux;
+    
+    return decodificado;
+}
+
+bool tratar_caso() {
+    string mensaje;
+    getline(cin, mensaje);
+
+    if (!cin)
+        return false;
+
+    cout << decodificacion(mensaje) << endl;
     return true;
 }
 
@@ -42,3 +84,4 @@ int main() {
 #endif
   return 0;
 }
+

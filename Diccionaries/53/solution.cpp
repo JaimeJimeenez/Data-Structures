@@ -1,42 +1,67 @@
 #include <iostream>
-#include <unordered_map>
-#include <vector>
+#include <fstream>
+#include <map>
+#include <set>
 
 using namespace std;
 
-void tratar_caso() {
-    int num_linea;
-    cin >> num_linea;
+void bingo(const map<int, set<string>> &cartones, map<string, int>& jugadores) {
+    bool bingo = false;
+    int bola;
 
-    vector<pair<string, int>> programa;
-    unordered_map<int, int> diccionario;
-
-    int cont = 10;
-
-    while (num_linea != 0) {
-        string instruccion;
-        cin >> instruccion;
-        int salto;
-        if ( instruccion == "GOTO" || instruccion == "GOSUB")
-            cin >> salto;
-        programa.push_back(instruccion, salto);
-        diccionario[num_linea] = cont;
-        cont += 10;
-        cin >> num_linea;
+    while (!bingo) {
+        cin >> bola;
+        if (cartones.count(bola) == 1) {
+            auto& carton = cartones.at(bola);
+            for (auto elem : carton) {
+                jugadores[elem]--;
+                if (jugadores[elem] == 0) bingo = true;
+            }
+        }
     }
 
-    cont = 10;
-    for (auto const& instruccion : programa) {
-        cout << cont << " " << instruccion.first;
-        if (instruccion.first == "GOTO" || instruccion == "GOSUB")
-            cout << " " << diccionario[instruccion.second];
-        cout << endl;
-        cont += 10;
+    for (auto const& it : jugadores)
+        if (it.second == 0) cout << it.first << " ";
+    cout << endl;
+}
+
+bool tratar_caso() {
+    int N;
+    cin >> N;
+    if (N == 0) return false;
+
+    map<int, set<string>> cartones;
+    map<string, int> jugadores;
+    while (N--) {
+        string nombre;
+        int valor;
+        cin >> nombre;
+
+        set<int> numeros;
+        cin >> valor;
+        while (valor != 0) {
+            cartones[valor].insert(nombre);
+            jugadores[nombre]++;
+            cin >> valor;
+        }
     }
 
-    cout << "---\n";
+    bingo(cartones, jugadores);
+    return true;
 }
 
 int main() {
+#ifndef DOMJUDGE
+  std::ifstream in("sample.in");
+  auto cinbuf = std::cin.rdbuf(in.rdbuf());
+#endif
 
+    while (tratar_caso());
+
+#ifndef DOMJUDGE
+  std::cin.rdbuf(cinbuf);
+  // Descomentar si se trabaja en Windows
+  // system("PAUSE");
+#endif
+  return 0;
 }

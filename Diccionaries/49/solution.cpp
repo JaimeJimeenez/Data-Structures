@@ -1,65 +1,56 @@
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "MapTree.h"
 
 using namespace std;
 
-void actualizados(vector<string> const &actualizacion) {
-  for (auto elem : actualizacion)
-    cout << elem << " ";
-  cout << endl;
+void aMinusculas(string& palabra) {
+  for (char& c : palabra)
+    c = tolower(c);
 }
 
-void actualizacion(MapTree<string, int>& nuevo, MapTree<string, int>& viejo) {
-  vector<string> eliminados, modificados;
+bool tratar_caso() {
+  int num_lineas;
+  cin >> num_lineas;
+  if (num_lineas == 0) return false;
+  
+  cin.ignore();
 
-  for (auto& it : viejo)
-    if (!nuevo.contains(it.key)) eliminados.push_back(it.key);
-    else{
-      if (it.value != nuevo[it.key]) modificados.push_back(it.key);
-      nuevo.erase(it.key);
+  MapTree<string, vector<int>> diccionario;
+  int i = 1;
+  
+  while (num_lineas--) {
+    string linea, palabra;
+    getline(cin, linea);
+    
+    stringstream flujo(linea);
+    while (flujo >> palabra) {
+      aMinusculas(palabra);
+
+      if (palabra.length() > 2) {
+        vector<int>& lista_linea = diccionario[palabra];
+        if (lista_linea.empty() || lista_linea.back() != i)
+          lista_linea.push_back(i);
+      }
     }
+    i++;
+  }
 
-  if (eliminados.empty() && nuevo.empty() && modificados.empty())
-    cout << "Sin cambios\n";
-  else if (!nuevo.empty()) {
-    cout << "+ ";
-    for (auto const& it : nuevo)
-      cout << it.key << " ";
+  for (const auto & it : diccionario) {
+    auto list = it.value;
+
+    cout << it.key << " ";
+    for (auto elem : list)
+      cout << elem << " ";
     cout << endl;
   }
-  if (!eliminados.empty()) {
-    cout << "- ";
-    actualizados(eliminados);
-  }
-  if (!modificados.empty()) {
-    cout << "* ";
-    actualizados(modificados);
-  }
-}
 
-void tratar_caso() {
-  string linea, palabra;
-  getline(cin, linea);
-  
-  MapTree<string, int> viejoDiccionario;
-  stringstream viejo(linea);
-  while (viejo >> palabra) 
-    viejo >> viejoDiccionario[palabra];
-  
-  getline(cin, linea);
-
-  MapTree<string, int> nuevoDiccionario;
-  stringstream nuevo(linea);
-  while (nuevo >> palabra) 
-    nuevo >> nuevoDiccionario[palabra];
-
-  actualizacion(nuevoDiccionario, viejoDiccionario);
   cout << "---\n";
+  return true;
 }
 
 int main() {
@@ -67,11 +58,8 @@ int main() {
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-  int num_casos;
-  cin >> num_casos;
-  cin.ignore();
   
-  while (num_casos--) { tratar_caso(); }
+  while (tratar_caso()) {  }
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);

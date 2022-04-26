@@ -24,8 +24,6 @@
 #include <utility>
 #include <tuple>
 #include <algorithm>
-#include <string>
-#include <math.h>
 
 template <class T> class BinTree {
 public:
@@ -60,6 +58,12 @@ public:
   }
 
   void display(std::ostream &out) const { display_node(root_node, out); }
+  
+  int size() const { return size(this->root_node); }
+
+  int height() const { return height(this->root_node); }
+
+  int children() const { return children(this->root_node); }
 
 private:
   // Las definiciones de TreeNode y NodePointer dependen recursivamente
@@ -90,6 +94,28 @@ private:
       display_node(root->right, out);
       out << ")";
     }
+  }
+
+  int size(const NodePointer &root) const {
+    if (root == nullptr)
+        return 0;
+    return 1 + size(root->left) + size(root->right);
+  }
+
+  int height(const NodePointer &root) const {
+    if (root == nullptr)
+        return 0;
+    
+    return 1 + std::max(height(root->right), height(root->left));
+  }
+
+  int children(const NodePointer &root) const {
+    if (root == nullptr)
+        return 0;
+    else if (root->right == nullptr && root->left == nullptr)
+        return 1;
+    else
+        return children(root->right) + children(root->left); 
   }
 };
 
@@ -124,28 +150,11 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-template<typename T>
-int num_nodos(const BinTree<T> &tree) {
-  if (tree.empty())
-    return 0;
-  return 1 + num_nodos(tree.left()) + num_nodos(tree.right());
-}
-
-template<typename T>
-int altura(const BinTree<T> &tree) {
-  if (tree.empty())
-    return 0;
-  return 1 + max(altura(tree.left()), altura(tree.right()));
-}
-
-bool es_completo(const BinTree<char> &tree) {
-  return num_nodos(tree) == (pow(2, altura(tree)) - 1);
-}
 
 // Función que trata un caso de prueba
 void tratar_caso() {
-   BinTree<char> t = read_tree<char>(cin);
-   cout << (es_completo(t) ? "SI" : "NO" ) << endl;
+  BinTree<char> t = read_tree<char>(cin);
+  cout << t.size() << " " << t.children() << " " << t.height() << endl;
 }
 
 
@@ -160,11 +169,12 @@ int main() {
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-  int numCasos;
-  cin >> numCasos;
-
-  while (numCasos--)
+  int num_casos;
+  cin >> num_casos;
+  
+  for (int i = 0; i < num_casos; i++) {
     tratar_caso();
+  }
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);

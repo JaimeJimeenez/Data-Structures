@@ -1,53 +1,65 @@
 #include <iostream>
 #include <fstream>
-#include <map>
-#include <set>
+#include <string>
+#include <sstream>
+#include <vector>
+
+#include "MapTree.h"
 
 using namespace std;
 
-void bingo(const map<int, set<string>> &cartones, map<string, int>& jugadores) {
-    bool bingo = false;
-    int bola;
-
-    while (!bingo) {
-        cin >> bola;
-        if (cartones.count(bola) == 1) {
-            auto& carton = cartones.at(bola);
-            for (auto elem : carton) {
-                jugadores[elem]--;
-                if (jugadores[elem] == 0) bingo = true;
-            }
-        }
-    }
-
-    for (auto const& it : jugadores)
-        if (it.second == 0) cout << it.first << " ";
-    cout << endl;
+void actualizados(vector<string> const &actualizacion) {
+  for (auto elem : actualizacion)
+    cout << elem << " ";
+  cout << endl;
 }
 
-bool tratar_caso() {
-    int N;
-    cin >> N;
-    if (N == 0) return false;
+void actualizacion(MapTree<string, int>& nuevo, MapTree<string, int>& viejo) {
+  vector<string> eliminados, modificados;
 
-    map<int, set<string>> cartones;
-    map<string, int> jugadores;
-    while (N--) {
-        string nombre;
-        int valor;
-        cin >> nombre;
-
-        set<int> numeros;
-        cin >> valor;
-        while (valor != 0) {
-            cartones[valor].insert(nombre);
-            jugadores[nombre]++;
-            cin >> valor;
-        }
+  for (auto& it : viejo)
+    if (!nuevo.contains(it.key)) eliminados.push_back(it.key);
+    else{
+      if (it.value != nuevo[it.key]) modificados.push_back(it.key);
+      nuevo.erase(it.key);
     }
 
-    bingo(cartones, jugadores);
-    return true;
+  if (eliminados.empty() && nuevo.empty() && modificados.empty())
+    cout << "Sin cambios\n";
+  else if (!nuevo.empty()) {
+    cout << "+ ";
+    for (auto const& it : nuevo)
+      cout << it.key << " ";
+    cout << endl;
+  }
+  if (!eliminados.empty()) {
+    cout << "- ";
+    actualizados(eliminados);
+  }
+  if (!modificados.empty()) {
+    cout << "* ";
+    actualizados(modificados);
+  }
+}
+
+void tratar_caso() {
+  string linea, palabra;
+  getline(cin, linea);
+  
+  MapTree<string, int> viejoDiccionario;
+  stringstream viejo(linea);
+  while (viejo >> palabra) 
+    viejo >> viejoDiccionario[palabra];
+  
+  getline(cin, linea);
+
+  MapTree<string, int> nuevoDiccionario;
+  stringstream nuevo(linea);
+  while (nuevo >> palabra) 
+    nuevo >> nuevoDiccionario[palabra];
+
+  actualizacion(nuevoDiccionario, viejoDiccionario);
+  cout << "---\n";
 }
 
 int main() {
@@ -55,8 +67,11 @@ int main() {
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-
-    while (tratar_caso());
+  int num_casos;
+  cin >> num_casos;
+  cin.ignore();
+  
+  while (num_casos--) { tratar_caso(); }
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);

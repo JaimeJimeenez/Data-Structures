@@ -1,53 +1,44 @@
 #include <iostream>
 #include <fstream>
-#include <set>
 #include <map>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 
-void calificaciones(const map<string, map<string, string>> &preguntas, map<string, int> &estudiantes, int numPreguntas) {
-    string pregunta, respuesta;
-    
-    while (numPreguntas--) {
-        cin >> pregunta >> respuesta;
-        if (preguntas.count(pregunta) == 1) {
-            auto respuestas = preguntas.at(pregunta);
-            for (auto const& it : respuestas) 
-                if (it.second == respuesta) estudiantes[it.first]--;
-        }
-    }
-
-}
-
-void estudiantesPerfectos(const map<string, int>& estudiantes) {
-    int perfectos = 0;
-    
-    for (auto const& estudiante : estudiantes)
-        if (estudiante.second == 0) perfectos++;
-    cout << perfectos << endl; 
-
+void maximumCapitulos(const map<int, int>& series) {
+    for (auto const& it : series)
+        cout << it.second << endl;
 }
 
 bool tratar_caso() {
-    int N, A, P;
-    cin >> N >> A >> P;
-    if (N == 0 && A == 0 && P == 0) return false;
+    int N, M;
+    cin >> N;
+    if (!cin) return false;
 
-    map<string, map<string, string>> preguntas;
-    map<string, int> estudiantes;
-    while (N--) {
-        string nombre;
-        cin >> nombre;
-        for (int i = 0; i < A; i++) {
-            string pregunta, respuesta;
-            cin >> pregunta >> respuesta;
-            preguntas[pregunta].insert( { nombre, respuesta } );
+    map<int, int> series;
+    for (int i = 0; i < N; i++) {
+        cin >> M;
+        
+        series[i] = 0;
+
+        set<int> capitulos;
+        int capitulo;
+        int maximum = 0;
+        while (M--) {
+            cin >> capitulo;
+            maximum++;
+            if (capitulos.count(capitulo) == 0) {
+                capitulos.insert(capitulo);
+                
+            }
+            else {
+                series.at(i) = max(series[i], maximum);
+                maximum = 0;
+            }
         }
-        estudiantes[nombre] = A;
     }
-
-    calificaciones(preguntas, estudiantes, P);
-    estudiantesPerfectos(estudiantes);
+    maximumCapitulos(series);
     return true;
 }
 

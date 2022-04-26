@@ -1,26 +1,39 @@
 #include <iostream>
 #include <fstream>
-
-#include "ListLinkedDouble.h"
+#include <sstream>
+#include <string>
 
 using namespace std;
 
-void tratar_caso() {
-    ListLinkedDouble<int> list;
-    int value;
-    cin >> value;
+bool tratar_caso() {
+    string linea;
+    char comando;
+    getline(cin, linea);
+    if (!cin) return false;
 
-    while (value != 0) {
-        list.push_back(value);
-        cin >> value;
+    stringstream flujo(linea);
+    string secuencia;
+
+    auto it = linea.begin();
+    auto cursor = secuencia.begin();
+
+    while (flujo >> comando) {
+        if (comando == '+') 
+            cursor = secuencia.end();
+        else if (comando == '-') 
+            cursor = secuencia.begin();
+        else if (comando == '*')
+            ++cursor;
+        else if (comando == '3') 
+            cursor = secuencia.erase(cursor);
+        else {
+            secuencia.insert(cursor, comando);
+            ++cursor;
+        }
     }
 
-    auto it_inverso = list.rbegin(); it_inverso.advance();
-    while (it_inverso != --list.rend() ) {
-        cout << it_inverso.elem() << " ";
-        it_inverso.advance();
-    }
-    cout << endl;
+    cout << secuencia << endl;
+    return true;
 }
 
 int main() {
@@ -28,12 +41,8 @@ int main() {
     std::ifstream in("sample.in");
     auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-    int num_casos;
-    cin >> num_casos;
 
-    while (num_casos--) {
-        tratar_caso();
-    }
+    while (tratar_caso()) {}
 
 #ifndef DOMJUDGE
     std::cin.rdbuf(cinbuf);

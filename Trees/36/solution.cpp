@@ -123,36 +123,43 @@ using namespace std;
 // Modificar a partir de aquí
 // --------------------------------------------------------------
 
-struct Rescate {
-    int grupo, excursionistas;
-    bool hayExc;
-};
 
 template<typename T>
-Rescate rescate(const BinTree<T> &arbol) {
-  if (arbol.empty())
-    return { 0, 0, false };
+T minimo(const BinTree<T> &tree) {
+    if (tree.left().empty() && tree.right().empty())
+        return tree.root();
 
-  Rescate izq = rescate(arbol.left());
-  Rescate der = rescate(arbol.right());
+    T elem = tree.root();
 
-  if (arbol.root() == 0) {
-    if (izq.hayExc || der.hayExc)
-      return {izq.grupo + der.grupo, max(izq.excursionistas, der.excursionistas), true};
-    else
-      return {0, 0, false};
-  }
-  if (der.hayExc || izq.hayExc) 
-    return {izq.grupo + der.grupo, max(izq.excursionistas + arbol.root(), der.excursionistas + arbol.root()), true};
+    if (!tree.left().empty()) {
+        T minimIzq = minimo(tree.left());
+        elem = std::min(elem, minimIzq);
+    }
 
-  return {1, max(izq.excursionistas + arbol.root(), der.excursionistas + arbol.root()), true};
+    if (!tree.right().empty()) {
+        T minimDer = minimo(tree.right());
+        elem = std::min(elem, minimDer);
+    }
+    
+    return elem;
 }
 
 // Función que trata un caso de prueba
-void tratar_caso() {
-   BinTree<int> t = read_tree<int>(cin);
-   Rescate rescTotal = rescate(t);
-   cout << rescTotal.grupo << " " << rescTotal.excursionistas << endl;
+bool tratar_caso() {
+    char c;
+    cin >> c;
+    if (!cin)
+        return false;
+    
+    if (c == 'N') {
+        BinTree<int> t = read_tree<int>(cin);
+        cout << minimo(t) << endl;
+    }
+    else {
+        BinTree<std::string> t= read_tree<std::string>(cin);
+        cout << minimo(t) << endl;
+    }
+    return true;
 }
 
 
@@ -167,11 +174,8 @@ int main() {
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-  int numCasos;
-  cin >> numCasos;
-
-  while (numCasos--)
-    tratar_caso();
+  
+  while (tratar_caso());
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);
