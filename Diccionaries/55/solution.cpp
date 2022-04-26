@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <unordered_map>
 #include <vector>
 
@@ -17,9 +18,8 @@ void tratar_caso() {
         string instruccion;
         cin >> instruccion;
         int salto;
-        if ( instruccion == "GOTO" || instruccion == "GOSUB")
-            cin >> salto;
-        programa.push_back(instruccion, salto);
+        if (instruccion == "GOTO" || instruccion == "GOSUB") cin >> salto;
+        programa.push_back( { instruccion, salto });
         diccionario[num_linea] = cont;
         cont += 10;
         cin >> num_linea;
@@ -28,7 +28,7 @@ void tratar_caso() {
     cont = 10;
     for (auto const& instruccion : programa) {
         cout << cont << " " << instruccion.first;
-        if (instruccion.first == "GOTO" || instruccion == "GOSUB")
+        if (instruccion.first == "GOTO" || instruccion.first == "GOSUB")
             cout << " " << diccionario[instruccion.second];
         cout << endl;
         cont += 10;
@@ -38,5 +38,18 @@ void tratar_caso() {
 }
 
 int main() {
+#ifndef DOMJUDGE
+  std::ifstream in("sample.in");
+  auto cinbuf = std::cin.rdbuf(in.rdbuf());
+#endif
+    int numCasos;
+    cin >> numCasos;
+    while (numCasos--) tratar_caso();
 
+#ifndef DOMJUDGE
+  std::cin.rdbuf(cinbuf);
+  // Descomentar si se trabaja en Windows
+  // system("PAUSE");
+#endif
+  return 0;
 }
