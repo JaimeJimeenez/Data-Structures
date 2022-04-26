@@ -1,44 +1,31 @@
 #include <iostream>
 #include <fstream>
-#include <map>
-#include <set>
+#include <unordered_map>
 #include <algorithm>
 
 using namespace std;
 
-void maximumCapitulos(const map<int, int>& series) {
-    for (auto const& it : series)
-        cout << it.second << endl;
-}
-
 bool tratar_caso() {
-    int N, M;
-    cin >> N;
-    if (!cin) return false;
+    int M;
+    cin >> M;
 
-    map<int, int> series;
-    for (int i = 0; i < N; i++) {
-        cin >> M;
-        
-        series[i] = 0;
+    unordered_map<int, int> capitulos;
+    int capitulo;
+    int max = 0;
+    int noVistos = 0;
 
-        set<int> capitulos;
-        int capitulo;
-        int maximum = 0;
-        while (M--) {
-            cin >> capitulo;
-            maximum++;
-            if (capitulos.count(capitulo) == 0) {
-                capitulos.insert(capitulo);
-                
-            }
-            else {
-                series.at(i) = max(series[i], maximum);
-                maximum = 0;
-            }
+    for (int i = 0; i < M; i++) {
+        cin >> capitulo;
+        if (!capitulos.count(capitulo)) noVistos++;
+        else {
+            if (i - noVistos > capitulos[capitulo]) noVistos++;
+            else noVistos = i - capitulos[capitulo];
         }
+        capitulos[capitulo] = i;
+        max = std::max(max, noVistos);
     }
-    maximumCapitulos(series);
+
+    cout << max << "\n";
     return true;
 }
 
@@ -47,8 +34,9 @@ int main() {
   std::ifstream in("sample.in");
   auto cinbuf = std::cin.rdbuf(in.rdbuf());
 #endif
-
-    while (tratar_caso());
+    int numCasos;
+    cin >> numCasos;
+    while (numCasos--) tratar_caso();
 
 #ifndef DOMJUDGE
   std::cin.rdbuf(cinbuf);
