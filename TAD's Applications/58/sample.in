@@ -1,0 +1,30 @@
+nuevo_estado Arizona 11
+nuevo_estado RhodeIsland 4
+nuevo_estado California 55
+sumar_votos Arizona REP 1000
+sumar_votos Arizona DEM 500
+ganador_en Arizona
+sumar_votos California DEM 1000
+sumar_votos RhodeIsland REP 200
+ganador_en California
+sumar_votos Arizona DEM 600
+ganador_en Arizona
+resultados
+FIN
+nuevo_estado Nevada 6
+sumar_votos Arizona P1 10
+sumar_votos Nevada P2 200
+ganador_en Nevada
+ganador_en Arizona
+FIN
+nuevo_estado Illinois 20
+sumar_votos Illinois P1 10
+ganador_en Illinois
+resultados
+sumar_votos Illinois P2 20
+ganador_en Illinois
+resultados
+sumar_votos Illinois P3 30
+ganador_en Illinois
+resultados
+FIN

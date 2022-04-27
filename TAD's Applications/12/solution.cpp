@@ -56,12 +56,12 @@ public:
 
   void borrar_publicacion(int id) {
     if (publicaciones.count(id)) {
-    auto it = publicaciones[id].first.second;
-    recientes.erase(it);
+      auto it = publicaciones[id].first.second;
+      recientes.erase(it);
 
-    auto pHashtags = publicaciones[id].second;
-    for (auto hashtag : pHashtags) populares[hashtag]--;
-    publicaciones.erase(id);
+      auto pHashtags = publicaciones[id].second;
+      for (auto hashtag : pHashtags) populares[hashtag]--;
+      publicaciones.erase(id);
     }  
   }
 
