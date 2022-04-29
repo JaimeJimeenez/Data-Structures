@@ -134,8 +134,12 @@ bool tratar_caso() {
                 cin >> n;
 
                 auto const& recientes = reproductor.recent(n);
-                cout << "Las " << n << " mas recientes\n";
-                for (auto const& cancion : recientes) cout << cancion << "\n";
+                if (recientes.empty()) cout << "No hay canciones recientes\n";
+                else {
+                    cout << "Las " << recientes.size() << " mas recientes\n";
+                    for (auto const& cancion : recientes) cout << cancion << "\n";
+                }
+                
             }
             else if (opcion == "deleteSong") {
                 cin >> cancion;
