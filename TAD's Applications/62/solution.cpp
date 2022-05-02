@@ -20,7 +20,7 @@ public:
     void quitar(const string& dni, int puntos) {
         InfoConductor& info = buscar_conductor(dni);
         
-        if (info.puntos != 0) {
+        if (info.puntos != 0 && puntos != 0) {
             puntosConductores[info.puntos].erase(info.it);
             if (info.puntos < puntos) {
                 puntosConductores[0].push_front(dni);
@@ -40,7 +40,7 @@ public:
     void recuperar(const string& dni, int puntos) {
         InfoConductor& info = buscar_conductor(dni);
         
-        if (info.puntos != 15) {
+        if (info.puntos != 15 && puntos != 0) {
             puntosConductores[info.puntos].erase(info.it);
             if (info.puntos + puntos >= 15) {
                 puntosConductores[15].push_front(dni);
@@ -72,7 +72,9 @@ public:
         if (puntos < 0 || puntos > 15) throw
             domain_error("Puntos no validos");
         
-        return puntosConductores.at(puntos);
+        if (puntosConductores.count(puntos))
+            return puntosConductores.at(puntos);
+        return { };
     }
 
 private:
@@ -135,7 +137,7 @@ bool tratar_caso() {
                 cin >> puntos;
                 
                 auto listaConductores = dgt.lista_por_puntos(puntos);
-                cout << "Tienen " << puntos << ": ";
+                cout << "Tienen " << puntos << " puntos: ";
                 for (auto const it : listaConductores) cout << it << " ";
                 cout << "\n";
             }
