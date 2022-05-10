@@ -40,6 +40,7 @@ using namespace std;
 class Spitter {
 public:
 
+  //O(N) siendo N el número de hashtags
   void nueva_publicacion(int id, const string& texto, const vector<string> &hashtags) {
     if (publicaciones.count(id))
       throw std::domain_error("Identificador duplicado");
@@ -54,6 +55,7 @@ public:
     }
   }
 
+  //O(N) siendo N el número de hashtags 
   void borrar_publicacion(int id) {
     if (publicaciones.count(id)) {
       auto it = publicaciones[id].first.second;
@@ -65,6 +67,7 @@ public:
     }  
   }
 
+  //O(N) siendo N el número pasado como parámetro
   vector<string> mas_recientes(int n) const {
     auto it = recientes.begin();
     vector<string> ultimas;
@@ -76,6 +79,7 @@ public:
     return ultimas;
   }
 
+  //O(N) siendo N el número de hashtags
   vector<string> hashtags(int id) const {
     if (publicaciones.count(id) == 0)
       throw std::domain_error("Publicacion no existente");
@@ -87,6 +91,7 @@ public:
     return vHashtags;
   }
 
+  //O(1)
   void anyadir_hashtag(int id, const string &hashtag) {
     if (publicaciones.count(id) == 0)
       throw std::domain_error("Publicacion no existente");
@@ -98,6 +103,7 @@ public:
     }  
   }
 
+  //O(1)
   int popularidad(const string &hashtag) const {
     if (populares.count(hashtag)) return populares.at(hashtag);
     return 0;
