@@ -10,38 +10,44 @@ using namespace std;
 class OficinaEmpleo {
 public:
   void altaOficina(const string& nombre, const string& empleo) {
-    empleos[empleo].push_back(nombre);
-    if (!personas.count(nombre)) personas[nombre].insert( { empleo, --empleos[empleo].end() } );
-    else if (!personas[nombre].count(empleo)) personas[nombre].insert( { empleo, --empleos[empleo].end() } );
+    if (!empleos.count(empleo)) empleos[empleo] = { };
+    if (!personas.count(nombre)) {
+      auto it = empleos[empleo].insert(empleos[empleo].end(), nombre);
+      personas[nombre] = { { empleo, it } };
+    }
+    else if (!personas[nombre].count(empleo)) {
+      auto it = empleos[empleo].insert(empleos[empleo].end(), nombre);
+      personas[nombre].insert( { empleo, it } );
+    }
   }
 
   string ofertaEmpleo(const string& empleo) {
     if (!empleos.count(empleo)) throw
       domain_error("No existen personas apuntadas a este empleo");
-    
+
     string cualificada = empleos[empleo].front();
-    personas[cualificada].erase(empleo);
-    empleos[empleo].pop_front();
+    auto empleosPersona = personas[cualificada];
 
-    auto empleosCualificada = personas[cualificada];
-    auto it = empleosCualificada.begin();
-    
-    while (it != --empleosCualificada.end()) {
-      cout << it->first << endl;
-      empleos[it->first].erase(it->second);
-      it++;
+    for (auto it : empleosPersona) {
+      string elem = it.first;
+      empleos[elem].erase(it.second); 
+      if (empleos[elem].size() == 0) empleos.erase(elem);
     }
-
-    if (empleos.empty()) empleos.erase(empleo);
     personas.erase(cualificada);
-
+    
     return cualificada;
   }
 
-  vector<string> listadoEmpleos(const string& persona) const {
-    if (!personas.count(persona)) throw 
+  vector<string> listadoEmpleos(const string& persona) {
+    if (!personas.count(persona)) throw
       domain_error("Persona inexistente");
-    return { };
+
+    vector<string> lista;
+
+    for (auto it : personas[persona])
+      lista.push_back(it.first);
+    
+    return lista;
   }
 
 private:
