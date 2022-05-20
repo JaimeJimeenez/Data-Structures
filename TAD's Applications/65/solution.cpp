@@ -9,101 +9,146 @@ using namespace std;
 
 class Urgencias {
 public:
-    void nuevo_paciente(const string& paciente, int gravedad) {
-        if (gravedad <= 0 || gravedad > 3) throw
-            domain_error("Gravedad incorrecta");
-        if (pacientes.count(paciente)) throw
-            domain_error("Paciente repetido");
 
-        auto it = listaEspera.at(gravedad - 1).insert(listaEspera.at(gravedad - 1).end(), paciente);
-        pacientes[paciente] = { gravedad - 1, it };
+  Urgencias() : sala(3) { };
+
+  void nuevo_paciente(const string& paciente, int gravedad) {
+    if (pacientes.count(paciente)) throw
+      domain_error("Paciente repetido");
+    if (gravedad < 1 || gravedad > 3) throw 
+      domain_error("Gravedad incorrecta");
+
+    sala[gravedad - 1].push_back(paciente);
+    pacientes[paciente] = { gravedad, sala[gravedad - 1].end() };
+  }
+
+  int gravedad_actual(const string& paciente) const {
+    const InfoPaciente& info = buscar_paciente(paciente); 
+    return info.gravedad;
+  }
+
+  string siguiente() {
+    string paciente;
+
+    if (!sala[2].empty()) {
+      paciente = sala[2].front();
+      sala[2].pop_front();
+      
+      return paciente;
     }
+    else if (!sala[1].empty()) {
+      paciente = sala[1].front();
+      sala[1].pop_front();
 
-    int gravedad_actual(const string& paciente) const {
-        const InfoPaciente& info = buscar_paciente(paciente);
-        return info.gravedad; 
+      return paciente;
     }
+    else {
+      paciente = sala[0].front();
+      sala[0].pop_front();
 
-    string siguiente() {
-        
+      return paciente;
     }
+    throw domain_error("No hay pacientes");
+  }
 
-    void mejora(const string& paciente) {
+  void mejora(const string& paciente) {
+    InfoPaciente& info = buscar_paciente(paciente);
 
+    if (info.gravedad == 1) {
+      sanos.insert(paciente);
+      sala[info.gravedad - 1].erase(info.it);
+      pacientes.erase(paciente);
     }
+    else {
+      sala[info.gravedad - 1].erase(info.it);
+      info.gravedad--;
 
-    list<string> recuperados() {
-        list<string> lista;
-
-        auto it = listRecuperados.begin();
-        while (it != listRecuperados.end()) {
-            lista.push_back(*it);
-            it++;
-        }
-
-        return lista;
+      sala[info.gravedad - 1].push_front(paciente);
+      info.it = sala[info.gravedad - 1].begin();
     }
+  }
+
+  list<string> recuperados() {
+    list<string> lista;
+
+    for (auto paciente : sanos)
+      lista.push_back(paciente);
+
+    return lista;
+  }
 
 private:
-    vector<list<string>> listaEspera{ 3 };
-    set<string> listRecuperados;
+  
+  struct InfoPaciente {
+    int gravedad;
+    list<string>::iterator it;
+  };
 
-    struct InfoPaciente {
-        int gravedad;
-        list<string>::iterator it;
+  unordered_map<string, InfoPaciente> pacientes;
+  vector<list<string>> sala;
+  set<string> sanos;
+  
+  const InfoPaciente& buscar_paciente(const string& paciente) const {
+    auto it = pacientes.find(paciente);
+    if (it == pacientes.end()) throw
+      domain_error("Paciente inexistente");
+    
+    return it->second;
+  }
 
-        InfoPaciente(int gravedad, list<string>::iterator it) : gravedad(gravedad), it(it) { }
-    };
+  InfoPaciente& buscar_paciente(const string& paciente) {
+    auto it = pacientes.find(paciente);
+    if (it == pacientes.end()) throw
+      domain_error("Paciente inexsitente");
 
-    unordered_map<string, InfoPaciente> pacientes;
-
-    const InfoPaciente& buscar_paciente(const string& paciente) const {
-        auto it = pacientes.find(paciente);
-        if (it == pacientes.end()) throw
-            domain_error("Paciente inexistente");
-
-        return it->second;
-    }
+    return it->second;
+  }
 };
 
 bool tratar_caso() {
-    string opcion;
-    cin >> opcion;
-    if (!cin) return false;
+  string opcion;
+  cin >> opcion;
+  if (!cin) return false;
 
-    Urgencias urgencias;
+  Urgencias urgencias;
+  string paciente;
+  while (opcion != "FIN") {
+    try {
+      if (opcion == "nuevo_paciente") {
+        int gravedad;
+        cin >> paciente >> gravedad;
+        urgencias.nuevo_paciente(paciente, gravedad);
+      }
+      else if (opcion == "gravedad_actual") {
+        cin >> paciente;
+        int gravedad = urgencias.gravedad_actual(paciente);
 
-    while (opcion != "FIN") {
-        try {
-            if (opcion == "nuevo_paciente") {
+        cout << "La gravedad de " << paciente << " es " << gravedad << "\n";
+      }
+      else if (opcion == "siguiente") {
+        string siguiente = urgencias.siguiente();
 
-            }
-            else if (opcion == "gravedad_actual") {
+        cout << "Siguiente paciente: " << siguiente << "\n";
+      }
+      else if (opcion == "mejora") {
+        cin >> paciente;
+        urgencias.mejora(paciente);
+      }
+      else if (opcion == "recuperados") {
+        list<string> sanos = urgencias.recuperados();
 
-            }
-            else if (opcion == "siguiente") {
-
-            }
-            else if (opcion == "mejora") {
-
-            }
-            else if (opcion == "recuperados") {
-                list<string> recuperados = urgencias.recuperados();
-                auto it = recuperados.begin();
-
-                while (it != recuperados.end()) {
-                    cout << *it << endl;
-                    it++;
-                }
-            }
-        } catch (domain_error &exception) {
-            cout << "ERROR: " << exception.what() << "\n";
-        }
-        cin >> opcion;
+        cout << "Lista de recuperados: ";
+        for (auto paciente : sanos) cout << paciente << " ";
+        cout << "\n";
+      }
+    } catch(domain_error &exception) {
+      cout << "ERROR: " << exception.what() << "\n";
     }
+    cin >> opcion;
+  }
 
-    cout << "---\n";
-    return true;
+  cout << "---\n";
+  return true;
 }
 
 int main() {
