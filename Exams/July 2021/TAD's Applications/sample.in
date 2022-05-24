@@ -1,0 +1,23 @@
+anyadir_jugador jug1
+anyadir_jugador jug2
+colocar_caballero jug1 Granada
+colocar_caballero jug2 Granada
+colocar_caballero jug1 Granada
+puntuacion jug1
+puntuacion jug2
+colocar_caballero jug2 Granada
+puntuacion jug1
+puntuacion jug2
+colocar_caballero jug2 Aragon
+colocar_caballero jug1 Aragon
+regiones_en_disputa
+FIN
+colocar_caballero jug1 Sevilla
+anyadir_jugador jug1
+colocar_caballero jug1 Valencia
+colocar_caballero jug1 Galicia
+puntuacion jug1
+expulsar_caballeros Valencia
+puntuacion jug1
+expulsar_caballeros Valencia
+FIN
