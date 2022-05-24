@@ -11,27 +11,34 @@
  /*
   * Implementación del TAD Lista mediante listas enlazadas simples.
   *
-  * Esta versión introduce un puntero al último elemento.
+  * Esta versión introduce el constructor de copia.
   */
 
 #ifndef __LIST_LINKED_SINGLE_H
 #define __LIST_LINKED_SINGLE_H
 
-#include <cassert>
 #include <iostream>
-#include <string>
+#include <fstream>
+#include <cassert>
 
+/* --------------------------------------------------------------------
+ * Clase ListLinkedSingle
+ * --------------------------------------------------------------------
+ * Implementa el TAD lista mediante una lista enlazada simple con
+ * nodo fantasma y punteros al primer y último elemento.
+ * --------------------------------------------------------------------
+ */
 
-template<typename Elem>
+template<typename T>
 class ListLinkedSingle {
 private:
   struct Node {
-    Elem value;
+    T value;
     Node *next;
   };
 
 public:
-  ListLinkedSingle() { 
+  ListLinkedSingle(): num_elems(0) { 
     head = new Node;
     head->next = nullptr;
     last = head;
@@ -42,59 +49,63 @@ public:
   }
 
   ListLinkedSingle(const ListLinkedSingle &other)
-    : head(copy_nodes(other.head)) {
+    : head(copy_nodes(other.head)), num_elems(other.num_elems) {
       last = last_node();
   }
 
-  void push_front(const Elem &elem) {
+  void push_front(const T &elem) {
     Node *new_node = new Node { elem, head->next };
     if (head->next == nullptr) { last = new_node; }
     head->next = new_node;
+    num_elems++;
   }
 
-  void push_back(const Elem &elem);
+  void push_back(const T &elem);
 
   void pop_front() {
-    assert (head->next != nullptr);
+    assert (num_elems > 0);
     Node *old_head = head->next;
     head->next = head->next->next;
     if (head->next == nullptr) { last = head; }
     delete old_head;
+    num_elems--;
   }
 
   void pop_back();
 
-  int size() const;
+  int size() const {
+    return num_elems;
+  }
 
   bool empty() const {
-    return head->next == nullptr;
+    return num_elems == 0;
   };
   
-  const Elem & front() const {
-    assert (head->next != nullptr);
+  const T & front() const {
+    assert (num_elems > 0);
     return head->next->value;
   }
 
-  Elem & front() {
-    assert (head->next != nullptr);
+  T & front() {
+    assert (num_elems > 0);
     return head->next->value;
   }
 
-  const Elem & back() const {
+  const T & back() const {
     return last->value;
   }
 
-  Elem & back() {
+  T & back() {
     return last->value;
   }
   
-  const Elem & operator[](int index) const {
+  const T & operator[](int index) const {
     Node *result_node = nth_node(index);
     assert (result_node != nullptr);
     return result_node->value;
   }
 
-  Elem & operator[](int index) {
+  T & operator[](int index) {
     Node *result_node = nth_node(index);
     assert (result_node != nullptr);
     return result_node->value;
@@ -105,6 +116,7 @@ public:
       delete_list(head);
       head = copy_nodes(other.head);
       last = last_node();
+      num_elems = other.num_elems;
     }
     return *this;
   }
@@ -117,9 +129,14 @@ public:
   
   void partition(int pivot);
 
+  void attach(Node* node, Node* before);
+
+  void dettach(Node* node, Node* before);
+
 private:
   Node *head;
   Node *last;
+  int num_elems;
 
   void delete_list(Node *start_node);
   Node *last_node() const;
@@ -128,8 +145,8 @@ private:
 
 };
 
-template<typename Elem>
-typename ListLinkedSingle<Elem>::Node * ListLinkedSingle<Elem>::copy_nodes(Node *start_node) const {
+template<typename T>
+typename ListLinkedSingle<T>::Node * ListLinkedSingle<T>::copy_nodes(Node *start_node) const {
   if (start_node != nullptr) {
     Node *result = new Node { start_node->value, copy_nodes(start_node->next) };
     return result;
@@ -138,24 +155,25 @@ typename ListLinkedSingle<Elem>::Node * ListLinkedSingle<Elem>::copy_nodes(Node 
   }
 }
 
-template<typename Elem>
-void ListLinkedSingle<Elem>::delete_list(Node *start_node) {
+template<typename T>
+void ListLinkedSingle<T>::delete_list(Node *start_node) {
   if (start_node != nullptr) {
     delete_list(start_node->next);
     delete start_node;
   }
 }
 
-template<typename Elem>
-void ListLinkedSingle<Elem>::push_back(const Elem &elem) {
+template<typename T>
+void ListLinkedSingle<T>::push_back(const T &elem) {
   Node *new_node = new Node { elem, nullptr };
   last->next = new_node;
   last = new_node;
+  num_elems++;
 }
 
-template<typename Elem>
-void ListLinkedSingle<Elem>::pop_back() {
-  assert (head->next != nullptr);
+template<typename T>
+void ListLinkedSingle<T>::pop_back() {
+  assert (num_elems > 0);
   Node *previous = head;
   Node *current = head->next;
 
@@ -167,23 +185,11 @@ void ListLinkedSingle<Elem>::pop_back() {
   delete current;
   previous->next = nullptr;
   last = previous;
+  num_elems--;
 }
 
-template<typename Elem>
-int ListLinkedSingle<Elem>::size() const {
-  int num_nodes = 0;
-
-  Node *current = head->next;
-  while (current != nullptr) {
-    num_nodes++;
-    current = current->next;
-  }
-
-  return num_nodes;
-}
-
-template<typename Elem>
-typename ListLinkedSingle<Elem>::Node * ListLinkedSingle<Elem>::last_node() const {
+template<typename T>
+typename ListLinkedSingle<T>::Node * ListLinkedSingle<T>::last_node() const {
   Node *current = head;
   while (current->next != nullptr) {
     current = current->next;
@@ -191,8 +197,8 @@ typename ListLinkedSingle<Elem>::Node * ListLinkedSingle<Elem>::last_node() cons
   return current;
 }
 
-template<typename Elem>
-typename ListLinkedSingle<Elem>::Node * ListLinkedSingle<Elem>::nth_node(int n) const {
+template<typename T>
+typename ListLinkedSingle<T>::Node * ListLinkedSingle<T>::nth_node(int n) const {
   assert (0 <= n);
   int current_index = 0;
   Node *current = head->next;
@@ -205,8 +211,8 @@ typename ListLinkedSingle<Elem>::Node * ListLinkedSingle<Elem>::nth_node(int n) 
   return current;
 }
 
-template<typename Elem>
-void ListLinkedSingle<Elem>::display(std::ostream &out) const {
+template<typename T>
+void ListLinkedSingle<T>::display(std::ostream &out) const {
   out << "[";
   if (head->next != nullptr) {
     out << head->next->value;
@@ -219,30 +225,43 @@ void ListLinkedSingle<Elem>::display(std::ostream &out) const {
   out << "]";
 }
 
-
-template<typename Elem>
-std::ostream & operator<<(std::ostream &out, const ListLinkedSingle<Elem> &l) {
+template<typename T>
+std::ostream & operator<<(std::ostream &out, const ListLinkedSingle<T> &l) {
   l.display(out);
   return out;
 }
 
-template<typename Elem>
-void ListLinkedSingle<Elem>::partition(int pivot) {  
-  int num_elems = size();
+template<typename T>
+void ListLinkedSingle<T>::dettach(Node* node, Node* prev) {
+  prev->next = node->next;
+  node->next = nullptr;
+}
+
+template<typename T>
+void ListLinkedSingle<T>::attach(Node* node, Node* last_node) {
+  last_node->next = node;
+  node->next = nullptr;
+}
+ 
+template <typename T> 
+void ListLinkedSingle<T>::partition(int pivot) {
   Node* curr = head->next;
-  
-  while (num_elems--) {
-    if (curr->next->value >= pivot) {
-      Node* sig = curr->next;
-      std::cout << sig->value << curr->value << std::endl;
-      curr->next = sig->next;
-      curr = curr->next;
+  Node* prev = head;
+  int cont = 0;
+
+  while (cont != num_elems) {
+    if (curr->value > pivot) {
+      Node* aux = curr->next;
+      dettach(curr, prev);
+      attach(curr, last);
+      this->last = curr;
+      curr = aux;
     }
     else {
-      std::cout << curr->value << std::endl;
+      prev = curr;
       curr = curr->next;
-      std::cout << curr->value << std::endl;
     }
+    cont++;
   }
 }
 
