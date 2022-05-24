@@ -129,6 +129,10 @@ public:
   
   void unzip(ListLinkedSingle &dest);
 
+  void attach(Node* node, Node* before);
+
+  void dettach(Node* node, Node* before);
+
 private:
   Node *head;
   Node *last;
@@ -226,37 +230,40 @@ std::ostream & operator<<(std::ostream &out, const ListLinkedSingle<T> &l) {
   l.display(out);
   return out;
 }
+
+template<typename T>
+void ListLinkedSingle<T>::dettach(Node* node, Node* prev) {
+  prev->next = node->next;
+  node->next = nullptr;
+}
+
+template<typename T>
+void ListLinkedSingle<T>::attach(Node* node, Node* last_node) {
+  last_node->next = node;
+  node->next = nullptr;
+}
  
 template <typename T> 
 void ListLinkedSingle<T>::unzip(ListLinkedSingle &dest) {
   Node* curr = head->next;
   Node* prev = head;
-  Node* curr_other = dest.last;
-  int cont = 0;
+  bool odd = false;
 
-  while (curr->next != nullptr) {
-    if (cont % 2 == 0) {
+  while (curr != nullptr) {
+    if (odd) {
+      Node* aux = curr->next;
+      dettach(curr, prev);
+      attach(curr, dest.last);
+      dest.last = curr;
+      curr = aux;
+      dest.num_elems++;
+      this->num_elems--;
+    }
+    else {
       prev = curr;
       curr = curr->next;
     }
-    else {
-      Node* aux = curr->next;
-      prev->next = aux;
-      curr_other->next = curr;
-      dest.last = curr;
-      curr_other = curr;
-      curr->next = nullptr;
-      curr = aux;
-    }
-    cont++;
-  }
-
-  if (cont % 2 != 0) {
-    prev->next = nullptr;
-    last = prev;
-    curr_other->next = curr;
-    dest.last = curr;
-    curr_other = curr;
+    odd = !odd;
   }
 }
 
