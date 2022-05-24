@@ -59,23 +59,34 @@ public:
     }
 
     int puntuacion(const string& jugador) const {
-        return puntuaciones.at(jugador);
+        auto it = puntuaciones.find(jugador);
+        
+        if (it == puntuaciones.end()) throw 
+            domain_error("Jugador no existente");
+        
+        return it ->second;
     }
 
     vector<string> regiones_en_disputa() {
-        vector<string> list(disputados.size());
-        copy(disputados.begin(), disputados.end(), list.begin());
+        vector<string> list;
+
+        for (auto elem : disputados) 
+            list.push_back(elem);
+        
         return list;
     }
 
     void expulsar_caballeros(const string& region) {
-        if (!regiones.count(region) || regiones[region].mayoria == 0) throw
+        auto it = regiones.find(region);
+        if (it == regiones.end()) throw
             domain_error("Region vacia");
-        
+        if (it->second.mayoria == 0) throw
+            domain_error("Region vacia");
+
         InfoRegion& info = regiones[region];
         if (info.jugadores.size() == 1)
             puntuaciones[*info.jugadores.begin()]--;
-            
+
         regiones.erase(region);
         disputados.erase(region);
     }
