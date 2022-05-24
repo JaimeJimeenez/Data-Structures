@@ -17,89 +17,122 @@
 #ifndef __LIST_LINKED_SINGLE_H
 #define __LIST_LINKED_SINGLE_H
 
-#include <cassert>
 #include <iostream>
-#include <string>
+#include <fstream>
+#include <cassert>
 
+/* --------------------------------------------------------------------
+ * Clase ListLinkedSingle
+ * --------------------------------------------------------------------
+ * Implementa el TAD lista mediante una lista enlazada simple con
+ * nodo fantasma y punteros al primer y último elemento.
+ * --------------------------------------------------------------------
+ */
+
+template<typename T>
 class ListLinkedSingle {
 private:
   struct Node {
-    int value;
+    T value;
     Node *next;
   };
 
 public:
-  ListLinkedSingle(): head(nullptr) { }
+  ListLinkedSingle(): num_elems(0) { 
+    head = new Node;
+    head->next = nullptr;
+    last = head;
+  }
+  
   ~ListLinkedSingle() {
     delete_list(head);
   }
 
   ListLinkedSingle(const ListLinkedSingle &other)
-    : head(copy_nodes(other.head)) { }
-
-  void push_front(const int &elem) {
-    Node *new_node = new Node { elem, head };
-    head = new_node;
+    : head(copy_nodes(other.head)), num_elems(other.num_elems) {
+      last = last_node();
   }
 
-  void push_back(const int &elem);
+  void push_front(const T &elem) {
+    Node *new_node = new Node { elem, head->next };
+    if (head->next == nullptr) { last = new_node; }
+    head->next = new_node;
+    num_elems++;
+  }
+
+  void push_back(const T &elem);
 
   void pop_front() {
-    assert (head != nullptr);
-    Node *old_head = head;
-    head = head->next;
+    assert (num_elems > 0);
+    Node *old_head = head->next;
+    head->next = head->next->next;
+    if (head->next == nullptr) { last = head; }
     delete old_head;
+    num_elems--;
   }
 
   void pop_back();
 
-  int size() const;
+  int size() const {
+    return num_elems;
+  }
 
   bool empty() const {
-    return head == nullptr;
+    return num_elems == 0;
   };
   
-  const int & front() const {
-    assert (head != nullptr);
-    return head->value;
+  const T & front() const {
+    assert (num_elems > 0);
+    return head->next->value;
   }
 
-  int & front() {
-    assert (head != nullptr);
-    return head->value;
+  T & front() {
+    assert (num_elems > 0);
+    return head->next->value;
   }
 
-  const int & back() const {
-    return last_node()->value;
+  const T & back() const {
+    return last->value;
   }
 
-  int & back() {
-    return last_node()->value;
+  T & back() {
+    return last->value;
   }
   
-  const int & at(int index) const {
+  const T & operator[](int index) const {
     Node *result_node = nth_node(index);
     assert (result_node != nullptr);
     return result_node->value;
   }
 
-  int & at(int index) {
+  T & operator[](int index) {
     Node *result_node = nth_node(index);
     assert (result_node != nullptr);
     return result_node->value;
+  }
+
+  ListLinkedSingle & operator=(const ListLinkedSingle &other) {
+    if (this != &other) {
+      delete_list(head);
+      head = copy_nodes(other.head);
+      last = last_node();
+      num_elems = other.num_elems;
+    }
+    return *this;
   }
 
   void display(std::ostream &out) const;
+  
   void display() const {
     display(std::cout);
   }
-
-  void reverseSegment(int init, int fin);
-
+  
   void unzip(ListLinkedSingle &dest);
 
 private:
   Node *head;
+  Node *last;
+  int num_elems;
 
   void delete_list(Node *start_node);
   Node *last_node() const;
@@ -108,7 +141,8 @@ private:
 
 };
 
-ListLinkedSingle::Node * ListLinkedSingle::copy_nodes(Node *start_node) const {
+template<typename T>
+typename ListLinkedSingle<T>::Node * ListLinkedSingle<T>::copy_nodes(Node *start_node) const {
   if (start_node != nullptr) {
     Node *result = new Node { start_node->value, copy_nodes(start_node->next) };
     return result;
@@ -117,56 +151,41 @@ ListLinkedSingle::Node * ListLinkedSingle::copy_nodes(Node *start_node) const {
   }
 }
 
-void ListLinkedSingle::delete_list(Node *start_node) {
+template<typename T>
+void ListLinkedSingle<T>::delete_list(Node *start_node) {
   if (start_node != nullptr) {
     delete_list(start_node->next);
     delete start_node;
   }
 }
 
-void ListLinkedSingle::push_back(const int &elem) {
+template<typename T>
+void ListLinkedSingle<T>::push_back(const T &elem) {
   Node *new_node = new Node { elem, nullptr };
-  if (head == nullptr) {
-    head = new_node;
-  } else {
-    last_node()->next = new_node;
-  }
+  last->next = new_node;
+  last = new_node;
+  num_elems++;
 }
 
-void ListLinkedSingle::pop_back() {
-  assert (head != nullptr);
-  if (head->next == nullptr) {
-    delete head;
-    head = nullptr;
-  } else {
-    Node *previous = head;
-    Node *current = head->next;
+template<typename T>
+void ListLinkedSingle<T>::pop_back() {
+  assert (num_elems > 0);
+  Node *previous = head;
+  Node *current = head->next;
 
-    while (current->next != nullptr) {
-      previous = current;
-      current = current->next;
-    }
-
-    delete current;
-    previous->next = nullptr;
-  }
-}
-
-int ListLinkedSingle::size() const {
-  int num_nodes = 0;
-
-  Node *current = head;
-  while (current != nullptr) {
-    num_nodes++;
+  while (current->next != nullptr) {
+    previous = current;
     current = current->next;
   }
 
-  return num_nodes;
+  delete current;
+  previous->next = nullptr;
+  last = previous;
+  num_elems--;
 }
 
-
-ListLinkedSingle::Node * ListLinkedSingle::last_node() const {
-  assert (head != nullptr);
+template<typename T>
+typename ListLinkedSingle<T>::Node * ListLinkedSingle<T>::last_node() const {
   Node *current = head;
   while (current->next != nullptr) {
     current = current->next;
@@ -174,10 +193,11 @@ ListLinkedSingle::Node * ListLinkedSingle::last_node() const {
   return current;
 }
 
-ListLinkedSingle::Node * ListLinkedSingle::nth_node(int n) const {
+template<typename T>
+typename ListLinkedSingle<T>::Node * ListLinkedSingle<T>::nth_node(int n) const {
   assert (0 <= n);
   int current_index = 0;
-  Node *current = head;
+  Node *current = head->next;
 
   while (current_index < n && current != nullptr) {
     current_index++;
@@ -187,11 +207,12 @@ ListLinkedSingle::Node * ListLinkedSingle::nth_node(int n) const {
   return current;
 }
 
-void ListLinkedSingle::display(std::ostream &out) const {
+template<typename T>
+void ListLinkedSingle<T>::display(std::ostream &out) const {
   out << "[";
-  if (head != nullptr) {
-    out << head->value;
-    Node *current = head->next;
+  if (head->next != nullptr) {
+    out << head->next->value;
+    Node *current = head->next->next;
     while (current != nullptr) {
       out << ", " << current->value;
       current = current->next;
@@ -200,49 +221,43 @@ void ListLinkedSingle::display(std::ostream &out) const {
   out << "]";
 }
 
-void ListLinkedSingle::reverseSegment(int init, int fin) {
-    Node* prev = nullptr;
-    Node* node_init = head;
-    Node* node_end = head;
-
-    while (init--) {
-        prev = node_init;
-        node_init = node_init->next;
-        node_end = node_end->next;
-    }
-    std::cout << node_end->value << std::endl;
-
-    fin--;
-    Node* sig = node_init->next;
-    while (fin--) {
-        if (prev != nullptr) {
-            prev->next = sig;
-            node_init->next = sig->next;
-            sig->next = node_init;
-            sig = node_init->next;
-            std::cout << sig->value << std::endl;
-            
-            display();
-            std::cout << std::endl;
-        }
-    }
+template<typename T>
+std::ostream & operator<<(std::ostream &out, const ListLinkedSingle<T> &l) {
+  l.display(out);
+  return out;
 }
-
-void ListLinkedSingle::unzip(ListLinkedSingle &dest) {
-  Node* prev = nullptr;
-  Node* curr = head;
-  Node* sig = nullptr;
-  Node* last_other = dest.head;
+ 
+template <typename T> 
+void ListLinkedSingle<T>::unzip(ListLinkedSingle &dest) {
+  Node* curr = head->next;
+  Node* prev = head;
+  Node* curr_other = dest.last;
   int cont = 0;
 
-  //Acceso al ultimo nodo de la lista dest
-  if (last_other != nullptr) 
-    while (last_other->next != nullptr)
-      last_other = last_other->next;
+  while (curr->next != nullptr) {
+    if (cont % 2 == 0) {
+      prev = curr;
+      curr = curr->next;
+    }
+    else {
+      Node* aux = curr->next;
+      prev->next = aux;
+      curr_other->next = curr;
+      dest.last = curr;
+      curr_other = curr;
+      curr->next = nullptr;
+      curr = aux;
+    }
+    cont++;
+  }
 
-  if (last_other != nullptr)
-    std::cout << "Ultimo nodo de la lista dest: " << last_other->value << std::endl;
-
+  if (cont % 2 != 0) {
+    prev->next = nullptr;
+    last = prev;
+    curr_other->next = curr;
+    dest.last = curr;
+    curr_other = curr;
+  }
 }
 
 #endif

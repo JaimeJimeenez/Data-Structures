@@ -5,26 +5,25 @@
 using namespace std;
 
 void tratar_caso() {
-    int N, value;
-    cin >> N;
+  int N, value;
+  cin >> N;
 
-    ListLinkedSingle list;
-    while (N--) {
-        cin >> value;
-        list.push_back(value);
-    } 
+  ListLinkedSingle<int> list;
+  while (N--) {
+    cin >> value;
+    list.push_back(value);
+  }
 
-    cin >> N;
-    ListLinkedSingle other;
-    while (N--) {
-        cin >> value;
-        other.push_back(value);
-    }
+  cin >> N;
+  ListLinkedSingle<int> other;
+  while (N--) {
+    cin >> value;
+    other.push_back(value);
+  }
 
-    list.unzip(other);
-    list.display();
-    cout << endl;
-    
+  list.unzip(other);
+  cout << list << "\n";
+  cout << other << "\n";
 }
 
 int main() {
