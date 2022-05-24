@@ -24,7 +24,6 @@ int nodo_cuadrado_mayor_prof(const BinTree<int>& arbol) {
     return get<0>(nodo_cuadrado_mayor_prof_aux(arbol));
 }
 
-
 void tratar_caso() {
   BinTree<int> tree = read_tree<int>(std::cin);
   std::cout << nodo_cuadrado_mayor_prof(tree) << std::endl;
