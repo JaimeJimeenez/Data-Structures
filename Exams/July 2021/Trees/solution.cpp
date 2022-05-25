@@ -7,17 +7,14 @@ using namespace std;
 
 pair<bool, int> bien_codificado_aux(const BinTree<int> &arbol) {
     if (arbol.empty()) return { true, 0 };
-    if (arbol.left().empty() && arbol.right().empty())
-        if (arbol.root() == 0) return { true, 1 };
-        else return { true, 0 };
     
     auto [codificadoIzq, cerosIzq] = bien_codificado_aux(arbol.left());
     auto [codificadoDer, cerosDer] = bien_codificado_aux(arbol.right());
 
     if (arbol.root() == 0)
-        return { codificadoDer && codificadoIzq && cerosIzq - cerosDer <= 1, cerosIzq + cerosDer + 1 };
+        return { codificadoDer && codificadoIzq && abs(cerosIzq - cerosDer) <= 1, cerosIzq + cerosDer + 1 };
     else 
-        return { codificadoDer && codificadoIzq && cerosIzq - cerosDer <= 1, cerosIzq + cerosDer };
+        return { codificadoDer && codificadoIzq && abs(cerosIzq - cerosDer) <= 1, cerosIzq + cerosDer };
 }
 
 bool bien_codificado(const BinTree<int> &arbol) {
