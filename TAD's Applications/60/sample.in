@@ -1,0 +1,15 @@
+5
+nuevoLibro 20 Heidi
+nuevoLibro 30 Caperucita roja
+comprar Heidi
+numEjemplares Caperucita roja
+top10
+8
+nuevoLibro 1 La vuelta al mundo en 80 dias
+comprar La vuelta al mundo en 80 dias
+estaLibro La vuelta al mundo en 80 dias
+nuevoLibro 5 Viaje al centro de la tierra
+comprar Viaje al centro de la tierra
+comprar Viaje al centro de la tierra
+top10
+comprar La isla misteriosa

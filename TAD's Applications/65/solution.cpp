@@ -15,39 +15,30 @@ public:
   void nuevo_paciente(const string& paciente, int gravedad) {
     if (pacientes.count(paciente)) throw
       domain_error("Paciente repetido");
-    if (gravedad < 1 || gravedad > 3) throw 
+    if (gravedad < 1 || gravedad > 3) throw
       domain_error("Gravedad incorrecta");
-
-    sala[gravedad - 1].push_back(paciente);
-    pacientes[paciente] = { gravedad, sala[gravedad - 1].end() };
+    
+    auto it = sala[gravedad - 1].insert(sala[gravedad - 1].end(), paciente);
+    pacientes[paciente] = { gravedad, it };
   }
 
   int gravedad_actual(const string& paciente) const {
-    const InfoPaciente& info = buscar_paciente(paciente); 
-    return info.gravedad;
+    return buscar_paciente(paciente).gravedad;
   }
 
   string siguiente() {
-    string paciente;
 
-    if (!sala[2].empty()) {
-      paciente = sala[2].front();
-      sala[2].pop_front();
-      
-      return paciente;
-    }
-    else if (!sala[1].empty()) {
-      paciente = sala[1].front();
-      sala[1].pop_front();
+    for (int i = 2; i >= 0; i--) {
+      if (!sala[i].empty()) {
+        string paciente = sala[i].front();
+        
+        sala[i].pop_front();
+        pacientes.erase(paciente);
 
-      return paciente;
+        return paciente;
+      }
     }
-    else {
-      paciente = sala[0].front();
-      sala[0].pop_front();
 
-      return paciente;
-    }
     throw domain_error("No hay pacientes");
   }
 
@@ -55,16 +46,14 @@ public:
     InfoPaciente& info = buscar_paciente(paciente);
 
     if (info.gravedad == 1) {
-      sanos.insert(paciente);
       sala[info.gravedad - 1].erase(info.it);
       pacientes.erase(paciente);
+      sanos.insert(paciente);
     }
     else {
       sala[info.gravedad - 1].erase(info.it);
       info.gravedad--;
-
-      sala[info.gravedad - 1].push_front(paciente);
-      info.it = sala[info.gravedad - 1].begin();
+      info.it = sala[info.gravedad - 1].insert(sala[info.gravedad - 1].begin(), paciente);
     }
   }
 

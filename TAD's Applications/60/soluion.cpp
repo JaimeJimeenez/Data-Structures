@@ -10,41 +10,45 @@ using namespace std;
 class VentaLibros {
 public:
 
-  void nuevoLibro(const string& nombre, int ejemplares) {
-    libros[nombre] += ejemplares;
+  void nuevoLibro(int ejemplares, const string& libro) {
+    libros[libro].ejemplares += ejemplares;
   }
 
-  void comprar(const string& nombre) {
+  void comprar(const string& libro) {
+    if (!libros.count(libro)) throw
+      invalid_argument("Libro no existente");
+    if (libros[libro].ejemplares == 0) throw 
+      out_of_range("No hay ejemplares");
+    
+    libros[libro].ejemplares--;
+    libros[libro].vendidos++;
+  }
+
+  bool estaLibro(const string& libro) const {
+    return libros.count(libro);
+  }
+
+  void elimLibro(const string& libro) {
 
   }
 
-  bool estaLibro(const string& nombre) const {
-
-  }
-
-  void elimLibro(const string& nombre) {
-
-  }
-
-  int numEjemplares(const string& nombre) {
-
+  int numEjemplares(const string& libro) {
+    return 0;
   }
 
   list<string> top10() {
-
+    return { };
   }
     
 private:
 
-  unordered_map<string, int> libros;
   struct InfoLibro {
-    InfoLibro(int ejemplares) : ejemplares(ejemplares), vendidos(0) { }
-
-    int vendidos, ejemplares;
-    set<int>::iterator;
+    int ejemplares;
+    int vendidos;
   };
 
-  set<InfoLibro> vendidos;
+  unordered_map<string, InfoLibro> libros;
+
 };
 
 bool tratar_caso() {
@@ -53,35 +57,39 @@ bool tratar_caso() {
   if (!cin) return false;
   
   VentaLibros venta;
-  string opcion, nombre;
+  string opcion, libro;
   int ejemplares;
   while (N--) {
     cin >> opcion;
-    if (opcion == "nuevoLibro") {
-      cin >> ejemplares;
-      getline(cin, nombre);
-      venta.nuevoLibro(nombre, ejemplares);
+    try {
+      if (opcion == "nuevoLibro") {
+        cin >> ejemplares;
+        getline(cin, libro);
+        venta.nuevoLibro(ejemplares, libro);
+      }
+      else if (opcion == "comprar") {
+        getline(cin, libro);
+        venta.comprar(libro);
+      }
+      else if (opcion == "estaLibro") {
+        getline(cin, libro);
+        if (venta.estaLibro(libro))
+          cout << "El libro " << libro << " esta en el sistema\n";
+        else
+          cout << "No existe el libro " << libro << " en el sistema\n"; 
     }
-    else if (opcion == "comprar") {
-      getline(cin, nombre);
-      venta.comprar(nombre);
-    }
-    else if (opcion == "estaLibro") {
-      getline(cin, nombre);
-      if (venta.estaLibro(nombre))
-        cout << "El libro " << nombre << "esta en el sistema\n";
-      else
-        cout << "No existe el libro " << nombre << " en el sistema\n"; 
-    }
-    else if (opcion == "numEjemplares") {
-      getline(cin, nombre);
+      else if (opcion == "numEjemplares") {
+        getline(cin, libro);
 
-      int numEjemplares = venta.numEjemplares(nombre);
-      if (numEjemplares > 0) cout << "Existe " << numEjemplares << " ejemplares del libro " << nombre << "\n";
-      else cout << "No existe el libro " << nombre << " en el sistema\n";
+        int numEjemplares = venta.numEjemplares(libro);
+        if (numEjemplares > 0) cout << "Existe " << numEjemplares << " ejemplares del libro " << libro << "\n";
+        else cout << "No existe el libro " << libro << " en el sistema\n";
     }
     else if (opcion == "top10") {
 
+      }
+    } catch (domain_error& exception) {
+      cout << "ERROR: " << exception.what() << "\n";
     }
   }
 
